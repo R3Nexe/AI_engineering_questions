@@ -1,0 +1,16 @@
+{
+  "detector": {
+    "ignoreRules": [
+      "overused-font"
+    ],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-09-29T11:08:02.448Z",
+        "reason": "Explicit user request for Linear typography system"
+      }
+    ]
+  }
+}

@@ -1,0 +1,309 @@
+{
+  "version": 1,
+  "updated": "2026-09-28",
+  "categories": [
+    {
+      "id": "rag-optimization",
+      "name": "RAG System Optimization",
+      "symbol": "magnifyingglass.circle.fill",
+      "summary": "Retrieval-Augmented Generation pipeline design, re-ranking, chunking strategies, and 2025-era latency/quality trade-offs."
+    },
+    {
+      "id": "llm-inference",
+      "name": "LLM Inference Latency",
+      "symbol": "bolt.circle.fill",
+      "summary": "Speculative decoding, continuous batching, quantization, disaggregated prefill, and 2026 hardware-aware serving techniques."
+    },
+    {
+      "id": "agentic-workflows",
+      "name": "Agentic Workflow Design",
+      "symbol": "arrow.triangle.2.circlepath.circle.fill",
+      "summary": "Multi-agent orchestration, tool use, memory hierarchies, error recovery, and evaluation of long-horizon reasoning systems."
+    },
+    {
+      "id": "finetuning-context",
+      "name": "Fine-tuning vs. Context Window",
+      "symbol": "slider.horizontal.3",
+      "summary": "When to fine-tune vs. inject context, LoRA/QLoRA economics, knowledge cutoff management, and in-context learning limits."
+    },
+    {
+      "id": "multimodal-rag",
+      "name": "Multimodal RAG Architectures",
+      "symbol": "photo.stack.fill",
+      "summary": "Unified embeddings across text, image, audio, and video; late-fusion vs. early-fusion retrieval; ColPali and beyond."
+    }
+  ],
+  "questions": [
+    {
+      "id": "rag-opt-001",
+      "category": "rag-optimization",
+      "title": "Designing a Low-Latency, High-Precision RAG Pipeline",
+      "prompt": "Your team is building a customer-support RAG system for a fintech company. The corpus is 500 GB of PDFs, internal wikis, and structured policy tables. Users expect sub-2-second end-to-end responses and >90% answer precision at launch.\n\n**Design the full retrieval stack.** Address:\n1. Chunking strategy for heterogeneous document types.\n2. Embedding model selection and indexing approach (ANN algorithm, metadata filtering).\n3. Re-ranking stage: model choice and when to skip it.\n4. Query-rewriting or HyDE to handle sparse queries.\n5. How you would measure and iterate on retrieval quality offline before going live.",
+      "format": "design",
+      "difficulty": "hard",
+      "tags": ["RAG", "chunking", "re-ranking", "ANN", "HyDE", "embedding", "fintech"],
+      "expectedAnswer": "## Chunking\nUse **semantic chunking** (sentence-window or late-chunking via BAAI/bge-m3) rather than fixed-token windows. For PDFs with tables, run a layout parser (e.g., unstructured.io or Docling) to extract tables as Markdown and route them to a dedicated structured-data retriever (SQL or DuckDB over Parquet). Keep a ±1 sentence context window around retrieved chunks for coherence.\n\n## Indexing\n- **Embedding model:** `text-embedding-3-large` (OpenAI) or `bge-m3` (open-weights multilingual) at 1536 dims.\n- **ANN index:** HNSW (via Qdrant or Weaviate) with `ef_construction=200, M=32` for recall@10 > 0.97.\n- **Hybrid search:** combine dense retrieval with BM25 (Elasticsearch or Qdrant sparse vectors) via RRF (Reciprocal Rank Fusion) — robust for exact policy terms and rare identifiers.\n- **Metadata filters:** product line, document type, effective date pushed into payload filters to scope search before ANN.\n\n## Re-ranking\nDeploy a **cross-encoder** (e.g., `ms-marco-MiniLM-L-12-v2` or `Jina Reranker v2`) on the top-50 candidates → return top-5 to the LLM. Skip re-ranking only when latency SLO < 500 ms *and* hybrid retrieval already yields precision > 0.92 in offline eval. Cache re-ranking results for repeated queries using a Redis TTL.\n\n## Query Rewriting / HyDE\nFor short or ambiguous queries (< 8 tokens or cosine sim to top-1 doc < 0.6), apply **HyDE** (generate a hypothetical answer, embed it, retrieve against that vector). Apply **multi-query expansion** (generate 3 paraphrases, union results, deduplicate by doc-id) for medium-complexity questions. Gate via a lightweight classifier to avoid latency blowup on well-formed queries.\n\n## Offline Quality Measurement\n1. Build a **golden evaluation set** of 300–500 (query, relevant-doc-ids, reference-answer) triples — sourced from past support tickets.\n2. Track **nDCG@10** and **Recall@5** for retrieval; **RAGAS** (faithfulness, answer relevance, context precision) for end-to-end.\n3. Run automated regression on every embedding/chunking change via CI. Use **LLM-as-judge** (GPT-4o or Claude 3.5 Sonnet) for semantic equivalence scoring at scale.\n4. A/B shadow traffic once live; monitor drift in embedding cosine-sim distribution monthly.",
+      "keyPoints": [
+        "Semantic or late-chunking outperforms fixed-token splitting on mixed document types",
+        "Hybrid BM25 + dense retrieval with RRF is the robust production default",
+        "Cross-encoder re-ranking restores precision lost in ANN recall-precision trade-off",
+        "HyDE and multi-query expansion address sparse/short queries",
+        "RAGAS + LLM-as-judge enables scalable offline evaluation before launch"
+      ],
+      "followUps": [
+        "How would you handle documents that update frequently — e.g., policy tables that change weekly?",
+        "What's your strategy if the embedding model is deprecated and you need to re-index 500 GB?",
+        "How do you prevent the LLM from hallucinating when the retrieved context is partially relevant?"
+      ],
+      "sources": [
+        "https://arxiv.org/abs/2405.07437",
+        "https://arxiv.org/abs/2312.10997",
+        "https://docs.ragas.io/en/latest/"
+      ],
+      "timeLimitMinutes": 25
+    },
+    {
+      "id": "rag-opt-002",
+      "category": "rag-optimization",
+      "title": "Diagnosing and Fixing a RAG Pipeline with Degraded Recall",
+      "prompt": "Production monitoring shows your RAG system's answer quality has degraded over the past 4 weeks. User thumbs-down rate climbed from 8% to 22%. The underlying corpus has not changed.\n\n**Walk through your diagnostic process and remediation plan.** Specifically:\n1. What metrics and logs do you examine first?\n2. List at least four failure modes you would rule in/out and the evidence that distinguishes them.\n3. If the root cause is **embedding drift** (a new embedding model version was silently deployed to the corpus two weeks ago), how do you detect and remediate it without a full re-index downtime?",
+      "format": "concept",
+      "difficulty": "medium",
+      "tags": ["RAG", "observability", "embedding drift", "debugging", "production"],
+      "expectedAnswer": "## First-Pass Diagnostics\n- Pull **retrieval trace logs**: for a sample of thumbs-down queries, inspect which chunks were retrieved, their cosine similarity scores, and whether the ground-truth document appeared in top-k.\n- Check **latency percentiles** — sudden P99 spikes can indicate index fragmentation or infrastructure issues masquerading as quality degradation.\n- Look at **query distribution shift**: did query length, vocabulary, or topic distribution change (e.g., new product launch generating unfamiliar terms)?\n\n## Failure Modes\n1. **Embedding model version mismatch** — queries encoded with model v2, index built with v1. Evidence: cosine similarities cluster unusually low (< 0.55) across all queries; re-encoding a known query returns a different vector.\n2. **Index corruption or stale shards** — partial re-index left some shards on an old snapshot. Evidence: specific document types or date-ranges never appear in retrievals.\n3. **Query distribution shift** — users started asking compound multi-hop questions the original chunking doesn't handle. Evidence: bad queries cluster around new product terms; golden-set recall remains high.\n4. **Re-ranker overfitting** — re-ranker was fine-tuned on stale feedback and now suppresses genuinely relevant chunks. Evidence: recall@50 (before re-ranking) is high but precision@5 (after) collapsed.\n5. **LLM prompt regression** — a system-prompt change causes the model to ignore provided context. Evidence: retrieval scores are healthy but generated answers contradict the retrieved text (high faithfulness drop in RAGAS).\n\n## Remediating Embedding Drift Without Downtime\n1. **Detect**: compare embedding norms and nearest-neighbor overlap for 100 fixed anchor documents between the current live index and a freshly encoded sample. A cosine-sim drop > 0.1 confirms mismatch.\n2. **Zero-downtime remediation**: spin up a **shadow index** with the new model encoding the full corpus in a background job (incremental write via blue-green index swap in Qdrant/Weaviate). Route 5% of traffic to the shadow index, compare RAGAS scores; promote when parity is confirmed.\n3. **Short-term bridge**: deploy a **query-side adapter** (a lightweight linear projection trained to align new query embeddings into the old index space) to serve while the re-index completes. Adds ~2 ms overhead, buys hours or days of coverage.",
+      "keyPoints": [
+        "Start with retrieval trace logs and cosine-sim distributions before assuming model issues",
+        "Version mismatch between query and corpus embeddings is a silent, common production failure",
+        "Blue-green index swap enables zero-downtime re-indexing",
+        "A lightweight linear projection adapter can bridge encoder version mismatches temporarily",
+        "Distinguish retrieval failures from LLM faithfulness failures using RAGAS component scores"
+      ],
+      "followUps": [
+        "How would you set up an automated early-warning system that catches embedding drift before users notice?",
+        "If re-indexing costs $8,000 in compute, how do you justify it to product leadership with data?"
+      ],
+      "sources": [
+        "https://arxiv.org/abs/2401.15884",
+        "https://qdrant.tech/documentation/concepts/collections/#collection-aliases"
+      ],
+      "timeLimitMinutes": 20
+    },
+    {
+      "id": "llm-inf-001",
+      "category": "llm-inference",
+      "title": "Architecting a Sub-100 ms TTFT Serving Stack for a 70B Model",
+      "prompt": "You are the ML Infrastructure lead tasked with serving a 70B-parameter dense transformer (Llama-3-70B-Instruct) at scale. The SLO is **TTFT (Time-To-First-Token) < 100 ms** at P90 for a mixed-length request distribution (128–4096 input tokens). Budget allows H100 SXM5 nodes.\n\n**Design the full inference serving stack.** Cover:\n1. **Disaggregated prefill/decode** — why and how.\n2. **Tensor parallelism vs. pipeline parallelism** trade-offs for this model size.\n3. **Continuous batching** and the scheduler knobs you would tune.\n4. **KV-cache management** (PagedAttention, prefix caching) to sustain throughput under long-context traffic.\n5. Any **2026-era technique** (e.g., speculative decoding variants, MLA, attention kernels) you'd layer on top.",
+      "format": "design",
+      "difficulty": "hard",
+      "tags": ["inference", "TTFT", "disaggregated prefill", "continuous batching", "KV cache", "speculative decoding", "H100"],
+      "expectedAnswer": "## Disaggregated Prefill / Decode\nPrefill is compute-bound (matrix-vector → matrix-matrix ops); decode is memory-bandwidth-bound. Mixing them in the same batch causes **prefill-induced decode stalls** (\"prefill pollution\") that blow TTFT. **DistServe / Mooncake architecture**: run separate prefill replicas (fewer, TP=8 per H100 node) and decode replicas (more, TP=4), with KV-cache migrated over NVLink/RoCE after prefill completes. This isolates scheduling domains and lets each tier be independently scaled.\n\n## Tensor vs. Pipeline Parallelism\nFor 70B on H100s:\n- **TP=8** (all-reduce within a single 8-GPU NVLink node) is ideal for latency — all-reduce latency on NVLink is ~20 µs vs. hundreds of µs over IB for PP.\n- **PP** only makes sense when the model exceeds a single node's HBM (not the case at 70B in FP16/BF16 with 8×80 GB = 640 GB headroom). PP adds pipeline bubble overhead (1/stages fraction of wasted compute).\n- **Expert parallelism** would apply for MoE variants but not dense 70B.\n\n## Continuous Batching & Scheduler Knobs\nvLLM / SGLang with continuous batching:\n- `max_num_seqs`: set to GPU-memory-derived limit (not a fixed 256) to avoid OOM; dynamic based on current KV-cache occupancy.\n- `chunked prefill` (vLLM ≥ 0.4): interleave prefill chunks with decode steps to bound decode stall at configurable `max_num_batched_tokens` (e.g., 4096 prefill tokens per step). Crucial for the TTFT SLO.\n- Scheduler priority: FCFS for baseline; switch to **earliest-deadline-first** if tail-latency SLOs are strict.\n\n## KV-Cache Management\n- **PagedAttention**: non-contiguous 16-token pages eliminate fragmentation; enables high memory utilization (>90%) vs. 60–70% with static allocation.\n- **Prefix caching (RadixAttention / SGLang)**: cache KV for shared system prompts. For a chat product with a fixed 2K system prompt, this yields 30–50% decode FLOP savings on follow-up turns.\n- **KV quantization**: INT8 or FP8 KV cache (supported in vLLM ≥ 0.5) halves HBM footprint, doubling effective batch size at the cost of minimal quality degradation.\n\n## 2026-era Techniques\n- **Speculative decoding with draft model**: pair 70B with a 7B draft (same family); achieve 2–3× decode throughput on non-adversarial traffic (code, structured output). Use **EAGLE-2 / Medusa** for draft-head variants that avoid a second model load.\n- **FlashAttention-3 / FlashInfer**: fused CUDA kernels for decode attention reduce memory reads by 4–8×; mandatory for H100 tensor-core utilization.\n- **MLA (Multi-head Latent Attention)**: as used in DeepSeek-V2/V3; compresses KV cache by 5–13× via low-rank projection. If the model is MLA-native, KV memory is no longer the bottleneck.\n- **Quantization**: AWQ or GPTQ INT4 for weights reduces memory bandwidth by 2×; combine with FP8 KV cache for maximum throughput density.",
+      "keyPoints": [
+        "Disaggregated prefill/decode eliminates prefill-induced stalls; critical for sub-100ms TTFT SLOs",
+        "TP=8 within NVLink dominates PP for 70B models that fit on one node",
+        "Chunked prefill in continuous batching prevents long-prefill requests from starving decode",
+        "PagedAttention + prefix caching together maximize HBM utilization",
+        "Speculative decoding and FlashAttention-3 are table-stakes 2026 inference optimizations"
+      ],
+      "followUps": [
+        "How does your architecture change if 30% of requests have >16K input tokens?",
+        "What's the failure mode when a speculative draft model disagrees with the target model frequently?",
+        "How do you load-balance across decode replicas when KV-cache migration adds latency?"
+      ],
+      "sources": [
+        "https://arxiv.org/abs/2401.09671",
+        "https://arxiv.org/abs/2406.12778",
+        "https://arxiv.org/abs/2309.06180"
+      ],
+      "timeLimitMinutes": 30
+    },
+    {
+      "id": "llm-inf-002",
+      "category": "llm-inference",
+      "title": "Quantization Strategy for a Cost-Constrained Production Deployment",
+      "prompt": "Your company needs to cut LLM serving costs by 40% without regressing benchmark scores more than 2% (MMLU, HumanEval, MT-Bench). The current deployment uses a 34B model in BF16 on 4×A100 80 GB nodes.\n\n**Recommend a quantization strategy and justify every trade-off.** Address:\n1. Which quantization scheme (PTQ vs. QAT, INT4/INT8/FP8, weight-only vs. activation quantization) fits this constraint.\n2. How you would validate quality without running the full benchmark suite on every experiment.\n3. The risk of **quantization outliers** in large transformers and how to mitigate them.\n4. Deployment path: what serving framework changes are required?",
+      "format": "concept",
+      "difficulty": "medium",
+      "tags": ["quantization", "INT4", "AWQ", "GPTQ", "FP8", "cost optimization", "inference"],
+      "expectedAnswer": "## Recommended Scheme: AWQ INT4 (weight-only) with FP8 KV Cache\n**Rationale:** Weight-only INT4 (via AWQ or GPTQ) reduces model memory from ~68 GB (BF16) to ~17 GB, allowing the 34B model to fit on a **single A100 80 GB** with headroom for KV cache. This cuts the node requirement from 4× to 1–2×, achieving >50% cost reduction.\n\n- **AWQ > GPTQ** for this use case: AWQ preserves salient weights (those with large activation magnitudes) at higher precision through per-channel scaling, giving 0.5–1.5% lower perplexity than GPTQ at the same bit-width. No gradient required (PTQ), so calibration takes <1 hour on 512 representative samples.\n- **Activation quantization (W4A8 or W8A8)** would give faster GEMM kernels but risks precision collapse on transformer activations with large outliers — avoid unless using SmoothQuant or LLM.int8() to handle them.\n- **FP8 KV cache**: pair with FP8 KV (hardware-native on H100; emulated on A100) for an additional 1.5–2× effective batch-size increase.\n\n## Rapid Quality Validation\n1. **Perplexity proxy**: correlates strongly with downstream task performance. Run perplexity on WikiText-103 and a domain-specific held-out set after each quantization experiment (~5 min). Gate to full benchmark only when perplexity delta < 0.3 nats.\n2. **MT-Bench subset**: run 20 representative prompts (2 per category) for fast human-pref signal without 80-question full suite.\n3. **LLM-as-judge delta scoring**: compare quantized vs. BF16 on 100 diverse prompts using GPT-4o as judge; accept if win-rate < 48% (i.e., models are statistically indistinguishable).\n\n## Quantization Outliers\nLarge transformers (>13B) have **activation outliers** in specific channels (magnitude 100× larger than typical) that cause INT8 activations to saturate. Mitigations:\n- **SmoothQuant**: mathematically migrates outlier difficulty from activations to weights via per-channel scaling factors; enables W8A8 without quality loss.\n- **AWQ's salient-weight preservation**: explicitly identifies and protects high-magnitude weight channels from INT4 rounding.\n- **Mixed-precision**: keep attention Q/K/V projections in INT8, FFN layers in INT4 — targets outlier-prone layers without full-precision overhead.\n\n## Serving Framework Changes\n- Switch to **vLLM with AWQ kernel** (via `AutoAWQ` integration) or **llama.cpp** for GGUF INT4 on A100.\n- Validate that the CUDA kernel version supports the exact quant scheme (e.g., `vllm >= 0.4.2` for AWQ+FP8 KV on A100).\n- Benchmark throughput regression: INT4 decode is kernel-bound; ensure `marlin` kernel (fast INT4×FP16 GEMM) is active — gives 2–3× over naive INT4.",
+      "keyPoints": [
+        "AWQ INT4 weight-only quantization typically stays within 1-2% quality regression at 4× memory reduction",
+        "Perplexity on a held-out set is a fast proxy for full benchmark regressions",
+        "Activation outliers in large transformers require SmoothQuant or AWQ salient-weight protection",
+        "Marlin kernel is required to realize INT4 throughput gains in vLLM on Ampere/Hopper GPUs",
+        "FP8 KV cache compounds INT4 weight savings for maximum cost reduction"
+      ],
+      "followUps": [
+        "If MMLU regresses by 3.1% with INT4, what is your next step before resorting to INT8?",
+        "How does quantization interact with LoRA adapters if you need to serve multiple fine-tuned variants?"
+      ],
+      "sources": [
+        "https://arxiv.org/abs/2306.00978",
+        "https://arxiv.org/abs/2208.07339",
+        "https://arxiv.org/abs/2211.10438"
+      ],
+      "timeLimitMinutes": 20
+    },
+    {
+      "id": "agent-001",
+      "category": "agentic-workflows",
+      "title": "Designing a Reliable Multi-Agent Code Review System",
+      "prompt": "You are building a **multi-agent system** that automates code review for a large monorepo (~2M LOC, Python + TypeScript). The system must:\n- Detect security vulnerabilities and logic bugs.\n- Suggest refactors with working code diffs.\n- Self-verify suggestions by running a sandboxed test suite.\n- Escalate to a human when confidence is below a threshold.\n\n**Design the agent graph**, including:\n1. Agent roles, tools available to each, and how state is passed between them.\n2. How you prevent **looping or runaway execution** (agent calling itself or tools indefinitely).\n3. Memory architecture: what goes in working memory vs. external (vector/graph) memory.\n4. Evaluation strategy — how do you know the system is not introducing more bugs than it catches?",
+      "format": "design",
+      "difficulty": "hard",
+      "tags": ["multi-agent", "code review", "tool use", "memory", "safety", "evaluation"],
+      "expectedAnswer": "## Agent Graph\n```\nOrchestrator\n  ├─ Triage Agent       (reads diff, classifies risk, routes)\n  ├─ Security Agent     (SAST tools: Semgrep, Bandit; web search for CVEs)\n  ├─ Logic Agent        (reads full function context, reasons about correctness)\n  ├─ Refactor Agent     (generates unified diff; has code interpreter tool)\n  ├─ Verifier Agent     (executes diff in sandbox, runs scoped test suite)\n  └─ Escalation Agent   (formats human-readable report, posts to PR review)\n```\n**State passing:** Use a shared **RunContext** object (JSON blob in a task queue, e.g., Temporal workflow state) containing `{diff, file_map, findings[], confidence_scores[], iteration_count}`. Each agent reads from and appends to `findings[]`; the Orchestrator decides routing based on confidence and iteration count.\n\n**Tools per agent:**\n- Triage: `read_pr_diff`, `classify_risk_llm`\n- Security: `run_semgrep`, `search_nvd_cve`, `read_file_context`\n- Logic: `read_file_context`, `call_graph_lookup` (using a prebuilt symbol graph)\n- Refactor: `apply_diff`, `code_interpreter` (sandboxed Python/TS REPL)\n- Verifier: `run_test_suite_scoped`, `compare_coverage_delta`\n\n## Preventing Loops and Runaway Execution\n1. **Hard iteration cap**: `iteration_count` in RunContext; Orchestrator aborts and escalates if > 5 rounds on the same finding.\n2. **Idempotency keys**: each tool call is keyed by `(agent_id, tool_name, input_hash)`; duplicate calls within a run return cached result.\n3. **Budget cap**: total token budget per PR review (e.g., 100K tokens); Orchestrator tracks spend and escalates rather than exceeding budget.\n4. **Cycle detection**: Orchestrator maintains a directed graph of `(agent, finding_id)` calls; refuses to re-route a finding to an agent that already handled it in this run.\n5. **Timeout per agent**: each agent invocation has a 30-second wall-clock timeout enforced by the task queue (Temporal activity timeout).\n\n## Memory Architecture\n- **Working memory (in-context):** RunContext JSON + current file diff (< 32K tokens). Flushed after run completes.\n- **Short-term (session vector store):** embeddings of all files in the PR, stored in a local Qdrant instance scoped to the PR run. Enables semantic `read_file_context` lookups without loading all 2M LOC.\n- **Long-term (persistent graph):** code knowledge graph (symbols, call edges, ownership) prebuilt nightly via tree-sitter + networkx; persisted in Neo4j. Agents query it for cross-file impact analysis.\n- **Episodic (findings DB):** past confirmed bug patterns stored as embeddings; Security Agent uses similarity search against this DB to detect variants of known issues.\n\n## Evaluation Strategy\n1. **Recall on seeded bugs**: inject 50 known CVE-grade bugs into a shadow branch weekly; measure detection rate.\n2. **False-positive rate**: track human reviewer override rate per agent; target < 15% FP on security findings.\n3. **Net bug delta**: for merged PRs where the agent suggested diffs, compare pre/post defect density in production (using incident tracking linkage).\n4. **Verifier accuracy**: compare Verifier's test pass/fail prediction against actual CI outcome; alert when accuracy drops below 90%.\n5. **Regression test**: maintain a golden set of 200 historical PRs with known ground-truth findings; run full agent pipeline nightly, compare output via LLM-as-judge.",
+      "keyPoints": [
+        "Separation of concerns: Triage, Security, Logic, Refactor, Verifier, Escalation roles",
+        "Iteration caps, idempotency keys, and budget limits are all required to prevent runaway agents",
+        "Three-tier memory: in-context working memory, per-run vector store, persistent knowledge graph",
+        "Evaluation requires seeded-bug recall, FP rate tracking, and net production defect delta",
+        "Temporal or similar durable execution frameworks are better than ad-hoc retry loops for production agents"
+      ],
+      "followUps": [
+        "How do you handle a case where the Refactor Agent's suggestion passes the sandbox tests but introduces a security regression the Security Agent missed?",
+        "What changes if the codebase is 10× larger — 20M LOC across 50 services?"
+      ],
+      "sources": [
+        "https://arxiv.org/abs/2308.11432",
+        "https://docs.temporal.io/concepts/what-is-a-workflow",
+        "https://arxiv.org/abs/2402.01680"
+      ],
+      "timeLimitMinutes": 30
+    },
+    {
+      "id": "agent-002",
+      "category": "agentic-workflows",
+      "title": "Error Recovery and Observability in Long-Horizon Agents",
+      "prompt": "A production AI agent tasked with autonomous data pipeline repair has been running for 2 hours on a complex incident. It has called 47 tools, produced 3 intermediate artifacts, and appears stuck in a retry loop on a failing API call.\n\n**How do you design and operate agentic systems to avoid this situation, and recover from it when it occurs?** Address:\n1. Proactive design patterns that prevent long-horizon drift.\n2. Observability primitives you would instrument from day one.\n3. A concrete recovery protocol for the stuck agent scenario described above.\n4. How you would decide between **resuming**, **rolling back**, or **aborting** the agent run.",
+      "format": "concept",
+      "difficulty": "medium",
+      "tags": ["agent", "observability", "error recovery", "long-horizon", "reliability"],
+      "expectedAnswer": "## Proactive Design Patterns\n- **Hierarchical checkpointing**: write intermediate state (artifacts produced, tool call results, plan revisions) to durable storage (S3 + DynamoDB) after every significant action. Enables replay from last checkpoint without re-running 47 steps.\n- **Plan-then-execute with re-planning gates**: force the agent to produce an explicit step-by-step plan before acting; re-plan at defined milestones (every N steps or after unexpected tool errors). Prevents silent goal drift.\n- **Scope constraints at spawn time**: define a strict `ActionBoundary` — which tools, which resources, which blast radius — enforced by a policy layer (not the agent's own reasoning). Never let the agent self-expand its permissions.\n- **Maximum step budget**: hard cap (e.g., 100 tool calls per run); agent must checkpoint and request human extension beyond this. Non-negotiable.\n\n## Observability Primitives\n1. **Structured span tracing**: every tool call is a trace span with `{tool, input_hash, duration, output_tokens, status}` — exported to OpenTelemetry / Langfuse.\n2. **Goal drift score**: at each re-planning gate, embed the current agent state and compare cosine similarity to the original goal embedding. Alert if drift > threshold.\n3. **Loop detector**: sliding window over last 10 tool calls; flag if the same `(tool, input_hash)` appears 3+ times.\n4. **Token velocity**: track tokens consumed per minute; alert on sudden drops (agent stuck waiting) or spikes (runaway generation).\n5. **Artifact changelog**: every artifact written or mutated is versioned and diffed; surfaced in a real-time dashboard for the on-call engineer.\n\n## Recovery Protocol for the Stuck Agent\n1. **Pause without abort**: send a SIGPAUSE-equivalent to the agent orchestrator; freeze state at the current checkpoint without losing the 2 hours of work.\n2. **Inspect the loop**: query the trace for the last 10 tool calls; identify the failing API (likely 429/503) and the retry parameters being used.\n3. **Patch the retry policy**: inject a circuit-breaker override (exponential backoff with 5-minute cap, max 3 retries) into the task queue for that tool.\n4. **Resume from last clean checkpoint**: replay from the last checkpoint before the first retry attempt, with the patched retry policy active.\n5. **Human review of artifacts**: before resuming, show the on-call engineer the 3 intermediate artifacts for a 60-second sanity check.\n\n## Resume vs. Roll Back vs. Abort\n- **Resume**: intermediate artifacts are valid, root cause is transient (rate limit, flaky API). Checkpoint is recent (< 20 steps ago). Preferred — preserves work.\n- **Roll back**: intermediate artifacts mutated external state (DB writes, API calls with side effects) in a way that diverges from the target outcome. Roll back to last clean checkpoint and replay with corrected plan.\n- **Abort**: the original goal is no longer valid (incident was resolved externally), or accumulated cost/blast-radius exceeds policy limits, or human review reveals the intermediate artifacts are corrupted. Abort, preserve trace for post-mortem.",
+      "keyPoints": [
+        "Hierarchical checkpointing to durable storage is the foundation of long-horizon agent reliability",
+        "Loop detectors, goal drift scores, and token velocity are the three most valuable agent observability signals",
+        "Pause-then-inspect is safer than abort — preserves 2 hours of work",
+        "Resume/rollback/abort decision hinges on artifact validity and external side-effect reversibility",
+        "Scope constraints enforced by policy layer, not agent reasoning, prevent self-permission escalation"
+      ],
+      "followUps": [
+        "How would you instrument a multi-agent system where 5 agents are running concurrently and sharing artifacts?",
+        "What's the minimum viable observability stack for a solo engineer running agents in production for the first time?"
+      ],
+      "sources": [
+        "https://arxiv.org/abs/2405.14751",
+        "https://langfuse.com/docs/tracing",
+        "https://arxiv.org/abs/2309.07864"
+      ],
+      "timeLimitMinutes": 20
+    },
+    {
+      "id": "ft-ctx-001",
+      "category": "finetuning-context",
+      "title": "Fine-tuning vs. In-Context Learning: When to Use Which",
+      "prompt": "A product team comes to you with the following scenario: they have a base LLM (Llama-3.1-8B) and want to make it an expert at converting natural language to a proprietary SQL dialect with 40 custom functions and non-standard syntax. They have 8,000 labeled (NL, SQL) pairs.\n\n**Give a rigorous decision framework.** Address:\n1. Under what conditions fine-tuning dominates over few-shot in-context examples.\n2. How you would evaluate whether the 8K dataset is sufficient for LoRA fine-tuning.\n3. The risk of **catastrophic forgetting** and how to mitigate it.\n4. A hybrid approach using both fine-tuning and context injection, and when it is better than either alone.",
+      "format": "concept",
+      "difficulty": "medium",
+      "tags": ["fine-tuning", "LoRA", "in-context learning", "catastrophic forgetting", "SQL", "QLoRA"],
+      "expectedAnswer": "## When Fine-tuning Dominates In-Context Learning\nFine-tuning wins when:\n- **Format is highly non-standard**: the proprietary SQL dialect with 40 custom functions is unlikely to be well-represented in the base model's pretraining data. Few-shot examples in-context cannot fully teach new syntax; weights need updating.\n- **Consistency is required**: ICL is sensitive to example order and phrasing; fine-tuned models have stable output format distributions.\n- **Inference cost matters at scale**: 50 few-shot examples add ~3–5K tokens per call; at 10M queries/day, this is a significant cost multiplier.\n- **Context window is tight**: if production queries + schema already consume >6K tokens, ICL budget for examples is marginal.\n\nICL wins when: task changes frequently, labeled data is scarce (<500 examples), or the capability is already latent in the base model (e.g., standard SQL).\n\n## Evaluating Dataset Sufficiency for LoRA\n1. **Learning curve analysis**: train LoRA on 10%, 25%, 50%, 75%, 100% of the 8K dataset; plot exact-match accuracy vs. training set size. If the curve is still steeply rising at 8K, you need more data. If it has plateaued, 8K is sufficient.\n2. **Coverage of custom functions**: count how many of the 40 custom functions appear ≥ 30 times in training data. Functions with fewer examples will generalize poorly.\n3. **Held-out set composition**: ensure the 1K-example test set includes at least 10 examples per custom function and covers multi-join, subquery, and aggregation patterns proportionally.\n4. **Baseline comparison**: fine-tuned 8B vs. GPT-4o with 20 ICL examples on the held-out set. If the 8B fine-tune exceeds GPT-4o, data is sufficient.\n\n## Catastrophic Forgetting\nLoRA mitigates forgetting by design (only adapter weights change, base weights frozen). Residual risks:\n- If training data is heavily domain-biased, the model may lose instruction-following capability. **Mitigation**: mix 5–10% general instruction-following data (e.g., FLAN or Alpaca subsets) into the fine-tuning set.\n- Monitor a general reasoning benchmark (e.g., GSM8K) before and after fine-tuning; alert if regression > 3%.\n- Use **gradient checkpointing with low learning rate** (1e-4 to 3e-4 for LoRA), and **cosine LR schedule with warmup** to avoid sharp weight updates early in training.\n\n## Hybrid Approach\n**Fine-tuning teaches syntax and function signatures; context injection provides runtime schema and examples.**\n- Fine-tune the model on the 8K pairs to internalize the dialect and custom functions.\n- At inference time, inject the **current database schema** (table names, column types, foreign keys) into the system prompt — this cannot be baked into weights since it changes per customer.\n- Optionally, retrieve **2–3 semantically similar examples** from the training set using an embedding lookup (RAG over the NL→SQL pair corpus) and include them in context as dynamic few-shot examples.\n- This hybrid beats pure ICL (consistent syntax, lower token overhead) and pure fine-tuning (schema-aware, adapts to new tables without retraining).",
+      "keyPoints": [
+        "Fine-tuning wins for non-standard syntax, inference cost at scale, and consistent output formatting",
+        "Learning curve analysis is the most reliable way to assess whether a dataset is sufficient",
+        "LoRA prevents catastrophic forgetting by freezing base weights; mix in general data as a safeguard",
+        "Hybrid: fine-tune for dialect knowledge, inject schema and dynamic few-shot examples at runtime",
+        "Always benchmark against a strong ICL baseline (GPT-4o + 20 examples) before committing to fine-tuning"
+      ],
+      "followUps": [
+        "How does your answer change if the proprietary SQL dialect has 400 custom functions instead of 40?",
+        "The team wants to serve 10 customer-specific fine-tuned variants without 10× GPU memory. What's your approach?"
+      ],
+      "sources": [
+        "https://arxiv.org/abs/2106.09685",
+        "https://arxiv.org/abs/2305.14314",
+        "https://arxiv.org/abs/2110.02861"
+      ],
+      "timeLimitMinutes": 20
+    },
+    {
+      "id": "ft-ctx-002",
+      "category": "finetuning-context",
+      "title": "Managing Knowledge Cutoffs and Long-Context Trade-offs at Production Scale",
+      "prompt": "You are architecting an AI assistant that must answer questions about a rapidly evolving technical domain (cybersecurity threat intelligence). The base model has a knowledge cutoff of early 2025, but users ask about CVEs, threat actors, and malware campaigns published daily.\n\n**Design a system that keeps the model's knowledge current without continuous retraining.** Address:\n1. The trade-off between expanding context window size and maintaining response quality.\n2. How you would design a **tiered knowledge injection** strategy (what goes in context vs. weights vs. retrieval).\n3. Benchmarking strategy to detect when base model knowledge is stale enough to require a new fine-tune.\n4. The **lost-in-the-middle** problem and concrete mitigations for long-context retrieval injection.",
+      "format": "design",
+      "difficulty": "hard",
+      "tags": ["knowledge cutoff", "long-context", "RAG", "fine-tuning", "lost-in-the-middle", "cybersecurity"],
+      "expectedAnswer": "## Context Window vs. Response Quality Trade-off\nModels degrade on long contexts in two ways: **positional attention dilution** (recent tokens get disproportionate weight) and **lost-in-the-middle** (facts in the middle of a 128K context are recalled less reliably than facts at start/end). Empirically, most production 128K models show recall degradation beyond 64K tokens of context. Expanding context is not free: TTFT scales quadratically with prefill tokens (though FlashAttention-3 reduces this), and longer prompts increase inference cost linearly.\n\n**Rule of thumb:** keep retrieved context under 16K tokens for fact-dense technical queries; use aggressive chunk selection rather than stuffing the context window.\n\n## Tiered Knowledge Injection\n- **In weights (fine-tuning):** Stable, high-value knowledge — threat actor TTPs, foundational CVE taxonomy, MITRE ATT&CK framework mappings. Refresh with a quarterly QLoRA fine-tune on curated NVD + threat-intel feed exports. Weights are fast to query (zero retrieval latency) and reliable for well-represented entities.\n- **In retrieval (RAG):** Daily-updated threat intel — new CVEs, fresh IOCs, campaign reports. Index NVD, CISA KEV, and vendor advisories in near-real-time (webhook ingestion → chunking → embedding). Retrieved at query time; always current without retraining.\n- **In context (manual injection):** Session-specific context — the user's current incident scope, asset inventory, or active threat hypothesis. Injected by the application layer based on user profile; not retrieved automatically.\n\n## Detecting Stale Base Knowledge\n1. **Automated benchmark probe**: maintain a monthly-updated question set derived from recent CVEs and threat reports. Run the base model (without RAG) against this set; track exact-match accuracy over time.\n2. **Coverage gap detector**: query the retrieval index for the top-1000 most-queried threat entities; flag any entity not present in the base model's training vocabulary (via logit inspection on entity tokens).\n3. **Trigger threshold**: schedule a new QLoRA fine-tune when benchmark accuracy on the previous quarter's threat-intel questions drops below 70%, or when user negative-feedback rate exceeds 18%.\n\n## Lost-in-the-Middle Mitigations\n1. **Position-aware chunk ordering**: place the most relevant retrieved chunks at the **beginning and end** of the context window, not in the middle. Use re-ranker scores to sort: top-1 chunk at position 0, top-2 at position -1 (end), top-3 at position 1, etc. (interleave from edges inward).\n2. **Chunk compression**: before injection, pass retrieved chunks through a **selective summarization step** (a small 3B model) to reduce each chunk to its salient facts. Cuts token count by 60–70% while preserving recall.\n3. **Explicit citation prompting**: instruct the model to cite the specific chunk index when using a fact (e.g., `[Source 2]`). This forces attention to the indexed chunk positions and reduces hallucination from ignoring middle content.\n4. **Iterative retrieval**: for complex multi-hop queries, retrieve and answer in rounds — first retrieval answers sub-question 1, that answer seeds the next retrieval. Avoids stuffing all context upfront.",
+      "keyPoints": [
+        "Keep retrieved context under 16K tokens even with 128K window models for fact-dense technical queries",
+        "Tier knowledge: stable facts in weights, live data in RAG, session-specific data in manual context injection",
+        "Automated benchmark probes against dated question sets detect knowledge staleness before users do",
+        "Place most relevant chunks at context boundaries (beginning/end) to mitigate lost-in-the-middle",
+        "Chunk compression via a small summarization model reduces token count while preserving recall"
+      ],
+      "followUps": [
+        "How would you handle a zero-day CVE that breaks within 30 minutes of a user query — faster than your indexing pipeline?",
+        "If the QLoRA fine-tune degrades general reasoning by 4%, how do you weigh that against improved threat-intel accuracy?"
+      ],
+      "sources": [
+        "https://arxiv.org/abs/2307.03172",
+        "https://arxiv.org/abs/2402.14207",
+        "https://nvd.nist.gov/developers/vulnerabilities"
+      ],
+      "timeLimitMinutes": 25
+    },
+    {
+      "id": "mm-rag-001",
+      "category": "multimodal-rag",
+      "title": "Designing a Multimodal RAG System for Technical Documentation",
+      "prompt": "An engineering team needs a RAG assistant that can answer questions about complex hardware datasheets. These documents contain: dense text, circuit diagrams (raster images), timing waveform charts (SVG), component specification tables, and embedded 3D model screenshots.\n\n**Design the full multimodal RAG pipeline.** Address:\n1. How you index each modality (text, images, tables, diagrams).\n2. Whether to use a **unified embedding space** (single multimodal encoder) or **late-fusion** (separate encoders per modality, fused at retrieval time).\n3. How the **ColPali / ColQwen** document-embedding approach differs from OCR-then-embed and when to prefer each.\n4. The generation stage: how does the LLM consume multimodal retrieved context?\n5. Evaluation metrics for a multimodal RAG system.",
+      "format": "design",
+      "difficulty": "hard",
+      "tags": ["multimodal RAG", "ColPali", "CLIP", "late fusion", "document understanding", "vision-language"],
+      "expectedAnswer": "## Modality-Specific Indexing\n- **Text blocks**: standard semantic chunking → text embedding (BGE-M3 or OpenAI `text-embedding-3-large`). Preserve section hierarchy as metadata.\n- **Tables**: extract via layout parser (Docling or AWS Textract); convert to Markdown or structured JSON. Embed as text. Optionally store raw table in a structured retriever (DuckDB) for exact lookup queries.\n- **Raster images (circuit diagrams, screenshots)**: generate a **vision-language caption** using a VLM (e.g., InternVL-2, Qwen-VL) describing components, connections, and key labels. Embed caption as text *and* embed the image directly via a CLIP-style visual encoder. Store both vectors in the index with the image URI as payload.\n- **SVG charts**: render to PNG for VLM captioning; extract numeric data via SVG DOM parsing for structured queries.\n- **3D model screenshots**: treat as raster images; VLM caption identifies view angle and component labels.\n\n## Unified Embedding Space vs. Late Fusion\n- **Unified (single multimodal encoder):** CLIP, SigLIP, or `ImageBind` project images and text into a shared vector space. Query with text; retrieve images directly. Simple, fast, but image-text alignment is coarse — a query about a specific circuit topology may retrieve a broadly similar-looking diagram rather than the correct one.\n- **Late fusion (separate encoders, fused ranking):** separate text and image indexes; a query simultaneously searches both; results are merged via RRF or a learned fusion layer. More complex, but allows best-in-class specialist encoders for each modality and enables per-modality confidence scoring.\n- **Recommendation**: use **late fusion** for this use case. Technical diagrams require high visual precision that general CLIP encoders lack; pairing a domain-tuned text encoder with a VLM-generated-caption retriever gives better recall than a single multimodal encoder.\n\n## ColPali / ColQwen vs. OCR-then-Embed\n- **OCR-then-embed**: extract text with Tesseract/AWS Textract, chunk, embed. Loses spatial layout, table structure, and diagram content. Fast and cheap for text-heavy documents; fails on complex layouts and non-textual content.\n- **ColPali**: treats each document *page* as an image; encodes it using a PaliGemma-based model that produces **per-patch embeddings** (multi-vector representation of the full page visual). Query embeddings are compared via MaxSim (late interaction, like ColBERT) across all page patches. Retrieves the right page even when the answer is in a diagram with no adjacent OCR-able text.\n- **When to prefer ColPali**: documents with dense visual content, complex table layouts, or where spatial position of elements is semantically meaningful (e.g., a pin diagram where left-column entries differ from right-column). **When to prefer OCR-then-embed**: text-only documents, tight latency SLOs (ColPali's MaxSim scoring over patches is 3–5× slower than single-vector ANN).\n- **Hybrid**: use ColPali for the initial page retrieval, then extract and embed the specific text/table regions from the retrieved page for LLM context injection.\n\n## Generation Stage: Multimodal Context Consumption\n1. Retrieve top-K chunks/pages (text + image URIs).\n2. Assemble a **multimodal prompt**: interleave text chunks with inline images (base64 or URL references) in the order of relevance rank.\n3. Use a vision-capable LLM (GPT-4o, Claude 3.5 Sonnet, Qwen-VL-72B) that natively accepts `{type: image_url}` content blocks in the messages API.\n4. Instruct the model to reference the specific diagram index when using visual information: `\"According to Figure 3, the enable pin is active-low.\"`\n5. For structured table queries, prefer extracting the table to JSON and injecting as a `tool_result` rather than as an image — more reliable for arithmetic or lookup tasks.\n\n## Evaluation Metrics\n- **Retrieval recall@K by modality**: separately measure text-chunk recall and image-page recall on a golden set.\n- **Page-level hit rate**: for questions whose ground-truth answer is in a diagram, does the correct page appear in top-5?\n- **Visual answer accuracy**: VQA-style scoring — does the generated answer correctly describe the retrieved diagram?\n- **Faithfulness**: RAGAS faithfulness adapted for multimodal — does the answer's claim trace to a specific retrieved text chunk or image caption?\n- **Human eval on ambiguous visual queries**: a 100-question annotated set where the answer requires reading a diagram; measure human agreement rate with the model's answers.",
+      "keyPoints": [
+        "Late fusion (separate per-modality encoders) outperforms unified embeddings for technical domain documents",
+        "ColPali's per-patch multi-vector representation retrieves correct pages even when answers are in diagrams without nearby text",
+        "OCR-then-embed is faster but fails on complex layouts; use ColPali for visual-heavy docs, OCR for text-heavy",
+        "Generation requires a vision-capable LLM consuming interleaved text + image content blocks",
+        "Evaluate retrieval and generation separately, and include modality-specific metrics (page-level hit rate, VQA accuracy)"
+      ],
+      "followUps": [
+        "How would your design change if documents include embedded video clips (e.g., calibration procedure walkthroughs)?",
+        "ColPali is slower than single-vector ANN. How do you meet a 500 ms TTFT SLO for a corpus of 100K pages?"
+      ],
+      "sources": [
+        "https://arxiv.org/abs/2407.01449",
+        "https://arxiv.org/abs/2312.14238",
+        "https://arxiv.org/abs/2209.01002"
+      ],
+      "timeLimitMinutes": 30
+    },
+    {
+      "id": "mm-rag-002",
+      "category": "multimodal-rag",
+      "title": "Unified vs. Late-Fusion Retrieval in Video-Augmented RAG",
+      "prompt": "Your team is extending a text RAG system to also retrieve from a corpus of 50,000 product demo videos (average 8 minutes, 1080p). Users ask questions like: *\"Show me the frame where the presenter configures the VLAN settings\"* or *\"What error message appears during the onboarding flow at the 3-minute mark?\"*\n\n**Design a scalable video RAG retrieval system.** Cover:\n1. How you represent and index video content for semantic retrieval.\n2. The time-alignment problem: returning not just the right video, but the right **timestamp range**.\n3. Whether a unified text-video embedding (e.g., VideoCLIP) or a transcription-first approach is more practical at this scale.\n4. How you handle **visual-only queries** (no spoken text to transcribe) vs. **spoken-content queries**.\n5. Cost and compute budget for indexing 50K × 8-minute videos.",
+      "format": "design",
+      "difficulty": "hard",
+      "tags": ["video RAG", "multimodal", "VideoCLIP", "timestamp retrieval", "transcription", "ASR"],
+      "expectedAnswer": "## Video Content Representation and Indexing\n- **Transcription layer (ASR):** run Whisper large-v3 (or Distil-Whisper for 2× speed) on all videos to produce word-level timestamped transcripts. Chunk transcripts into 30-second semantic segments with 5-second overlap. Embed via `text-embedding-3-large`; store in HNSW index with `{video_id, start_sec, end_sec}` metadata.\n- **Visual keyframe layer:** sample 1 frame per second; deduplicate with perceptual hashing (pHash, Hamming distance < 8). Embed surviving keyframes via CLIP ViT-L/14 or SigLIP. Index in a separate vector collection keyed by `{video_id, timestamp_sec}`.\n- **Scene-level summary:** for each 30-second segment, pass the 5-frame thumbnail strip to a VLM (Qwen-VL or GPT-4o Vision) to generate a structured caption describing on-screen UI state, visible text, and presenter actions. Embed as text; append to transcript chunk.\n\n## Time-Alignment Problem\nReturning the right timestamp requires two-stage retrieval:\n1. **Video-level retrieval**: find the top-5 candidate videos using the transcript/summary embeddings.\n2. **Segment-level retrieval**: within the candidate videos, rank 30-second segments by similarity to the query. Return `{video_id, start_sec, end_sec}` of the top segment as a deep-link timestamp.\nFor visual queries, cross-reference the top-K matching keyframe timestamps against the video's scene graph to return a ±5-second clip window rather than a single frame.\n\n## Unified (VideoCLIP) vs. Transcription-First\n- **Unified (VideoCLIP, InternVideo2):** encodes video clips as single dense vectors; captures temporal dynamics. Advantage: handles visual-only content natively. Disadvantage: computationally expensive to encode 50K × 480 minutes at high frame rate; requires GPU at index time; semantic precision on domain-specific UI interactions (e.g., VLAN config screens) is lower than transcript + VLM caption.\n- **Transcription-first:** ASR + VLM captioning is cheaper, parallelizable, produces human-readable metadata, and achieves higher precision for spoken-content queries and screen-text queries. Disadvantage: fails for purely visual content (silent demonstrations, gestures).\n- **Recommendation at this scale:** transcription-first is the practical baseline (80%+ of queries are about spoken content or on-screen text). Layer a **sparse keyframe visual index** (CLIP embeddings) as a fallback for visual-only queries. Avoid full VideoCLIP unless the query distribution is predominantly temporal/motion-based.\n\n## Visual-Only vs. Spoken-Content Queries\n- **Spoken-content queries** (\"What does the presenter say about VLAN configuration?\"): served by transcript segment retrieval. High recall, fast.\n- **Visual-only queries** (\"Show me the frame where the error dialog appears\"): route to keyframe CLIP index. Use a query classifier (a fine-tuned small encoder) to detect visual-only intent and bypass transcript retrieval.\n- **Hybrid queries** (\"Find the frame where he *says* 'click Next' and the wizard is visible\"): run both retrievals in parallel; fuse results by `{video_id, timestamp_sec}` proximity (within ±10 seconds counts as a match), rank fused results by combined score.\n\n## Cost and Compute Budget\n50,000 videos × 8 min = 400,000 minutes = 6,667 hours of video.\n- **ASR (Whisper large-v3 on A10G):** ~100 min/video-hour → 66.7 GPU-hours → ~$67 at $1/GPU-hour. One-time cost.\n- **Keyframe extraction (CPU):** 1 FPS → 400K keyframes/hour × 6,667 hours = 2.67B frames before deduplication. At 95% dedup rate, ~133M unique frames. CLIP embedding at 1,000 images/sec/GPU → 133K GPU-seconds → ~37 A10G GPU-hours → ~$37.\n- **VLM scene captioning (GPT-4o vision):** 1 caption per 30-sec segment × 800K segments = 800K API calls at $0.005/call = **$4,000** (dominant cost). Mitigate with open-weight VLM (Qwen-VL-7B on A10G: $0.0005/call → $400).\n- **Total one-time indexing estimate:** ~$500–$600 with open-weight models. Re-indexing incremental new videos: linear at ~$0.01/video.",
+      "keyPoints": [
+        "Two-stage retrieval (video-level then segment-level) solves the time-alignment problem",
+        "Transcription-first + sparse visual keyframe fallback is more cost-effective than full VideoCLIP at 50K video scale",
+        "Route visual-only queries to CLIP keyframe index; use a lightweight query classifier to detect intent",
+        "VLM scene captioning is the dominant indexing cost; open-weight models reduce it by 10×",
+        "Perceptual hashing for keyframe deduplication can reduce CLIP index size by 90%+"
+      ],
+      "followUps": [
+        "How do you keep the index current as 500 new product videos are published each month?",
+        "A user asks: 'Find all videos where the presenter makes a configuration mistake.' How do you retrieve across the entire 50K corpus for this error-detection query?"
+      ],
+      "sources": [
+        "https://arxiv.org/abs/2104.00650",
+        "https://arxiv.org/abs/2212.04048",
+        "https://openai.com/research/whisper"
+      ],
+      "timeLimitMinutes": 30
+    }
+  ]
+}

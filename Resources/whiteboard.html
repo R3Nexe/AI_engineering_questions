@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script>console.log("HTML head loaded");</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Whiteboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
+    #root { width: 100%; height: 100%; }
+
+    /* Loading indicator */
+    #loading {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px;
+      background: #ffffff; color: #666; font-family: system-ui, sans-serif;
+      font-size: 14px; z-index: 9999;
+      transition: opacity 0.3s ease;
+    }
+    #loading.hidden { opacity: 0; pointer-events: none; }
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid #e0e0e0; border-top-color: #6965db;
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div id="loading">
+    <div class="spinner"></div>
+    <span>Loading whiteboard…</span>
+  </div>
+  <div id="root"></div>
+
+  <!--
+    Import map: pin React 18 so Excalidraw and app code share the same instance.
+    esm.sh resolves peer deps automatically via the ?deps= query.
+  -->
+  <script type="importmap">
+  {
+    "imports": {
+      "react":             "https://esm.sh/react@18.3.1",
+      "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+      "react-dom":         "https://esm.sh/react-dom@18.3.1",
+      "react-dom/client":  "https://esm.sh/react-dom@18.3.1/client"
+    }
+  }
+  </script>
+
+  <script type="module">
+    window.addEventListener('error', (e) => {
+        window.webkit.messageHandlers.log.postMessage('JS Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno);
+    });
+    import React from 'react';
+      from 'https://esm.sh/@excalidraw/excalidraw@0.17.6?deps=react@18.3.1,react-dom@18.3.1';
+
+    // ── State ──────────────────────────────────────────────────────────────
+    let excalidrawAPI  = null;
+    let lastSceneJson  = '';
+    let debounceTimer  = null;
+    const DEBOUNCE_MS  = 400;
+
+    // ── Swift message bridge helpers ───────────────────────────────────────
+    function postToSwift(handler, payload) {
+      window.webkit?.messageHandlers?.[handler]?.postMessage(payload);
+    }
+
+    // ── Root component ────────────────────────────────────────────────────
+    function WhiteboardApp() {
+      return React.createElement(Excalidraw, {
+        excalidrawAPI: (api) => {
+          excalidrawAPI = api;
+          // Hide loading overlay and signal readiness to Swift.
+          const overlay = document.getElementById('loading');
+          if (overlay) overlay.classList.add('hidden');
+          postToSwift('ready', 'ready');
+        },
+        onChange: (elements, appState, files) => {
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            try {
+              const json = serializeAsJSON(elements, appState, files ?? {}, 'local');
+              if (json !== lastSceneJson) {
+                lastSceneJson = json;
+                postToSwift('sceneChanged', json);
+              }
+            } catch (e) {
+              console.error('[Whiteboard] serialize error:', e);
+            }
+          }, DEBOUNCE_MS);
+        },
+      });
+    }
+
+    createRoot(document.getElementById('root'))
+      .render(React.createElement(WhiteboardApp));
+
+    // ── Public bridge (called by Swift via evaluateJavaScript) ─────────────
+
+    /**
+     * Load a previously-saved Excalidraw scene JSON.
+     * @param {string} json – output of serializeAsJSON / window.getScene()
+     * @returns {boolean} true on success
+     */
+    window.loadScene = function (json) {
+      if (!excalidrawAPI) return false;
+      try {
+        const data    = JSON.parse(json);
+        const files   = data.files ? Object.values(data.files) : [];
+        excalidrawAPI.updateScene({
+          elements: data.elements ?? [],
+          appState: {
+            ...(data.appState ?? {}),
+            collaborators: new Map(),  // required field for AppState
+          },
+        });
+        if (files.length > 0) excalidrawAPI.addFiles(files);
+        lastSceneJson = json;
+        return true;
+      } catch (e) {
+        console.error('[Whiteboard] loadScene error:', e);
+        return false;
+      }
+    };
+
+    /**
+     * Serialize and return the current scene as a JSON string.
+     * @returns {string}
+     */
+    window.getScene = function () {
+      if (!excalidrawAPI) return lastSceneJson || '{}';
+      try {
+        return serializeAsJSON(
+          excalidrawAPI.getSceneElements(),
+          excalidrawAPI.getAppState(),
+          excalidrawAPI.getFiles(),
+          'local'
+        );
+      } catch (e) {
+        console.error('[Whiteboard] getScene error:', e);
+        return lastSceneJson || '{}';
+      }
+    };
+
+    /**
+     * Clear the canvas back to a blank state.
+     */
+    window.clearScene = function () {
+      if (!excalidrawAPI) return;
+      excalidrawAPI.updateScene({ elements: [] });
+      lastSceneJson = '';
+      postToSwift('sceneChanged', '{}');
+    };
+  </script>
+</body>
+</html>

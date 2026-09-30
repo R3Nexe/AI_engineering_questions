@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build and caches
+.next/
+out/
+build/
+dist/
+.build/
+*.tsbuildinfo
+next-env.d.ts
+
+# Swift Package Manager
+.swiftpm/
+Packages/
+
+# Heavy local scratch clones
+Resources/excalidraw-local/
+
+# Environment and local secrets
+.env
+.env*.local
+!.env.example
+
+# Logs and debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Superdesign and scratch/staging
+.superdesign/tmp/
+.staging/
+.verify/
+
+# Operating System
+.DS_Store
+*.pem
+Thumbs.db

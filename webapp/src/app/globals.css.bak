@@ -1,0 +1,308 @@
+@import "tailwindcss";
+
+/* ── Font variables from next/font (set on <html> element via layout.tsx) ── */
+@theme inline {
+  --font-sans: var(--font-ui);
+  --font-mono: var(--font-code);
+}
+
+/* ── Design token map → Tailwind v4 utilities ── */
+@theme {
+  /* === Surface colors === */
+  --color-bg-deep:         #0b0d0f;  /* body canvas */
+  --color-bg-base:         #111318;  /* primary content surface */
+  --color-bg-raised:       #1a1d23;  /* sidebar, panels, toolbar */
+  --color-bg-overlay:      #22262e;  /* dropdowns, hover fill, code blocks */
+  --color-accent:          #e8813c;  /* ONE functional accent */
+  --color-accent-subtle:   #231508;  /* active row / selection tint */
+
+  /* === Border colors === */
+  --color-border-faint:    #1e2228;  /* hairline dividers */
+  --color-border-default:  #2a2f38;  /* pane edges, row rules */
+  --color-border-strong:   #404854;  /* focus rings, active outlines */
+
+  /* === Text colors === */
+  --color-text-primary:    #e4e8ef;  /* body, headings */
+  --color-text-secondary:  #8892a4;  /* metadata, labels (5.9:1 AA) */
+  --color-text-dim:        #848f9f;  /* captions, placeholders (5.2:1 AA) */
+  --color-text-inverse:    #0b0d0f;  /* on accent fill */
+
+  /* === Semantic status === */
+  --color-status-new:      #8892a4;  /* new / not started */
+  --color-status-partial:  #facc15;  /* attempted / in-progress */
+  --color-status-done:     #22c55e;  /* mastered / completed */
+
+  /* === Difficulty === */
+  --color-diff-easy:       #22c55e;
+  --color-diff-medium:     #facc15;
+  --color-diff-hard:       #ef4444;
+
+  /* === Type scale (enforced >= 1.25x step between adjacent levels) === */
+  --text-xs:   0.75rem;     /* 12px — chip labels, kbd hints */
+  --text-sm:   0.8125rem;   /* 13px — secondary body, metadata */
+  --text-base: 0.9375rem;   /* 15px — primary body copy */
+  --text-md:   1.25rem;     /* 20px (1.33x) — section headings */
+  --text-lg:   1.625rem;    /* 26px (1.30x) — page title */
+  --text-xl:   2.125rem;    /* 34px (1.30x) — hero metrics */
+  --text-2xl:  2.625rem;    /* 42px — timer only */
+
+  /* === Radii === */
+  --radius-none: 0px;       /* pane borders, rows — rounded-none */
+  --radius-sm:   2px;       /* chips — rounded-sm */
+  --radius-md:   4px;       /* buttons, inputs, kbd — rounded-md */
+  --radius-lg:   6px;       /* dropdowns, modals — rounded-lg */
+
+  /* === Motion === */
+  --duration-fast:   80ms;
+  --duration-normal: 100ms;
+  --duration-slow:   120ms;
+  --duration-pulse:  1s;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Base layer with Linear's Typography System ── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    background-color: var(--color-bg-deep);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+    font-size: var(--text-base);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Linear's signature OpenType features:
+       cv01: clean one-legged digit 1
+       cv02: alternate open 4
+       cv03: alternate 6
+       cv04: alternate 9
+       cv11: alternate single-story / clear capital I
+       ss01: alternate G
+       ss03: open curved lowercase r (clean terminal)
+       case: case-sensitive punctuation positioning
+    */
+    font-feature-settings: 'cv01' 1, 'cv02' 1, 'cv03' 1, 'cv04' 1, 'cv11' 1, 'ss01' 1, 'ss03' 1, 'case' 1;
+    letter-spacing: -0.011em;
+  }
+
+  /* === Headings — Linear proportional negative tracking scale === */
+  h1 {
+    font-size: var(--text-lg);
+    line-height: 1.2;
+    letter-spacing: -0.028em;
+    font-weight: 550;
+  }
+
+  h2 {
+    font-size: var(--text-md);
+    line-height: 1.25;
+    letter-spacing: -0.022em;
+    font-weight: 550;
+  }
+
+  h3 {
+    font-size: var(--text-base);
+    line-height: 1.3;
+    letter-spacing: -0.018em;
+    font-weight: 550;
+  }
+
+  h4, h5, h6 {
+    line-height: 1.35;
+    letter-spacing: -0.014em;
+    font-weight: 500;
+  }
+
+  /* === Monospace and code blocks === */
+  code,
+  kbd,
+  pre,
+  .font-mono {
+    font-family: var(--font-mono, 'JetBrains Mono', 'SF Mono', monospace);
+    font-feature-settings: 'zero' 1;
+    letter-spacing: -0.01em;
+  }
+
+  /* === Numeric tabular alignment for tables, timers, counts === */
+  .tabular-nums,
+  [data-tabular] {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1, 'zero' 1;
+  }
+
+  /* === Text selection === */
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-text-inverse);
+  }
+
+  /* === Global focus ring (accent) === */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* === Scrollbar (Linear-style hairline thumb) === */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border-default);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-border-strong);
+  }
+
+  /* === kbd element defaults === */
+  kbd {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: var(--text-xs);
+    background: var(--color-bg-overlay);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    padding: 2px 6px;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+    letter-spacing: 0;
+  }
+
+  /* === Markdown content rendering (Notion-style) === */
+  .markdown-content h1 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.025em;
+  }
+  .markdown-content h2 {
+    font-size: var(--text-md);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--color-border-faint);
+    letter-spacing: -0.02em;
+  }
+  .markdown-content h3 {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.015em;
+  }
+  .markdown-content p {
+    font-size: var(--text-base);
+    line-height: 1.65;
+    color: var(--color-text-primary);
+    margin-bottom: 0.85rem;
+  }
+  .markdown-content strong {
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .markdown-content em {
+    font-style: italic;
+    color: var(--color-text-secondary);
+  }
+  .markdown-content ul {
+    list-style-type: disc;
+    padding-left: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .markdown-content ol {
+    list-style-type: decimal;
+    padding-left: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .markdown-content li {
+    font-size: var(--text-base);
+    line-height: 1.6;
+    color: var(--color-text-primary);
+    margin-bottom: 0.35rem;
+  }
+  .markdown-content code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background-color: var(--color-bg-overlay);
+    border: 1px solid var(--color-border-default);
+    padding: 0.15rem 0.35rem;
+    border-radius: var(--radius-sm);
+    color: var(--color-accent);
+  }
+  .markdown-content pre {
+    background-color: var(--color-bg-raised);
+    border: 1px solid var(--color-border-default);
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  .markdown-content pre code {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    color: var(--color-text-primary);
+    font-size: var(--text-xs);
+  }
+  .markdown-content a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .markdown-content blockquote {
+    border-left: 2px solid var(--color-accent);
+    padding-left: 1rem;
+    color: var(--color-text-secondary);
+    font-style: italic;
+    margin: 1rem 0;
+    background: var(--color-bg-overlay);
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+  .markdown-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+  }
+  .markdown-content th,
+  .markdown-content td {
+    border: 1px solid var(--color-border-default);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    font-size: var(--text-sm);
+  }
+  .markdown-content th {
+    background: var(--color-bg-raised);
+    color: var(--color-text-primary);
+    font-weight: 600;
+  }
+}
+
+/* ── Motion: respect reduced-motion preference ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

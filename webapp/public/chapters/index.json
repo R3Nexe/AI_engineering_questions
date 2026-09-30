@@ -1,0 +1,4495 @@
+{
+  "source": {
+    "repo": "https://github.com/liquidslr/system-design-notes",
+    "book": "System Design Interview – An Insider's Guide (Vol 1 & 2), Alex Xu",
+    "importedAt": "2026-09-30T03:31:16.241Z"
+  },
+  "chapters": [
+    {
+      "slug": "ch01-scaling",
+      "number": 1,
+      "volume": 1,
+      "title": "Scale from Zero to Millions of Users",
+      "summary": "Scaling a system to support millions of users is a complex, iterative journey requiring refinement and optimization. This chapter outlines how to begin with a single server setup and scale the architecture step by step to handle millions of users.",
+      "concepts": [
+        "scalability",
+        "load-balancing",
+        "caching",
+        "replication"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Section 1: Single Server Setup"
+        },
+        {
+          "depth": 3,
+          "text": "Request Flow"
+        },
+        {
+          "depth": 3,
+          "text": "Traffic Sources"
+        },
+        {
+          "depth": 2,
+          "text": "Section 2: Database Separation"
+        },
+        {
+          "depth": 3,
+          "text": "Database Choices"
+        },
+        {
+          "depth": 2,
+          "text": "Section 3: Vertical vs Horizontal Scaling"
+        },
+        {
+          "depth": 3,
+          "text": "Vertical Scaling"
+        },
+        {
+          "depth": 3,
+          "text": "Horizontal Scaling"
+        },
+        {
+          "depth": 2,
+          "text": "Section 4: Load Balancer"
+        },
+        {
+          "depth": 2,
+          "text": "Section 5: Database Replication"
+        },
+        {
+          "depth": 3,
+          "text": "Master-Slave Model"
+        },
+        {
+          "depth": 3,
+          "text": "Benefits"
+        },
+        {
+          "depth": 3,
+          "text": "Failure Handling"
+        },
+        {
+          "depth": 2,
+          "text": "Section 6: Caching"
+        },
+        {
+          "depth": 3,
+          "text": "Caching considerations"
+        },
+        {
+          "depth": 2,
+          "text": "Section 7: Content Delivery Network (CDN)"
+        },
+        {
+          "depth": 3,
+          "text": "Workflow"
+        },
+        {
+          "depth": 3,
+          "text": "CDN considerations"
+        },
+        {
+          "depth": 2,
+          "text": "Section 8: Stateless Web Tier"
+        },
+        {
+          "depth": 2,
+          "text": "Section 9: Multi-Data Center Setup"
+        },
+        {
+          "depth": 3,
+          "text": "Key considerations"
+        },
+        {
+          "depth": 2,
+          "text": "Section 10: Message Queue"
+        },
+        {
+          "depth": 2,
+          "text": "Section 11: Logging, Metrics, and Automation"
+        },
+        {
+          "depth": 3,
+          "text": "Importance"
+        },
+        {
+          "depth": 2,
+          "text": "Section 12: Database Scaling"
+        },
+        {
+          "depth": 3,
+          "text": "Vertical Scaling"
+        },
+        {
+          "depth": 3,
+          "text": "Horizontal Scaling (Sharding)"
+        },
+        {
+          "depth": 2,
+          "text": "Conclusion"
+        },
+        {
+          "depth": 3,
+          "text": "Key Takeaways"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch01-scaling/images/single-server.png",
+          "alt": "Single Server",
+          "section": "Section 1: Single Server Setup"
+        },
+        {
+          "src": "/chapters/ch01-scaling/images/database.png",
+          "alt": "Database",
+          "section": "Section 2: Database Separation"
+        },
+        {
+          "src": "/chapters/ch01-scaling/images/load-balancer.png",
+          "alt": "Load Balancer",
+          "section": "Section 4: Load Balancer"
+        },
+        {
+          "src": "/chapters/ch01-scaling/images/database-replication.png",
+          "alt": "Database Replication",
+          "section": "Section 5: Database Replication"
+        },
+        {
+          "src": "/chapters/ch01-scaling/images/cache.png",
+          "alt": "Cache",
+          "section": "Section 6: Caching"
+        },
+        {
+          "src": "/chapters/ch01-scaling/images/cdn.png",
+          "alt": "Cdn",
+          "section": "Section 7: Content Delivery Network (CDN)"
+        },
+        {
+          "src": "/chapters/ch01-scaling/images/stateless.png",
+          "alt": "Stateless",
+          "section": "Section 8: Stateless Web Tier"
+        },
+        {
+          "src": "/chapters/ch01-scaling/images/data-center.png",
+          "alt": "Data Center",
+          "section": "Section 9: Multi-Data Center Setup"
+        },
+        {
+          "src": "/chapters/ch01-scaling/images/message-queue.png",
+          "alt": "Message Queue",
+          "section": "Section 10: Message Queue"
+        },
+        {
+          "src": "/chapters/ch01-scaling/images/logging.png",
+          "alt": "Logging",
+          "section": "Section 11: Logging, Metrics, and Automation"
+        },
+        {
+          "src": "/chapters/ch01-scaling/images/horizontal-scaling.png",
+          "alt": "Horizontal Scaling",
+          "section": "Horizontal Scaling (Sharding)"
+        }
+      ],
+      "unreferencedImages": [
+        "/chapters/ch01-scaling/images/statefull.png"
+      ],
+      "wordCount": 1307,
+      "readingMinutes": 6
+    },
+    {
+      "slug": "ch02-back-of-the-envelope-estimation",
+      "number": 2,
+      "volume": 1,
+      "title": "Back-of-the-Envelope Estimation",
+      "summary": "Back-of-the-envelope estimation is a crucial skill in system design interviews. It involves making quick, rough calculations to assess system capacity or performance.",
+      "concepts": [
+        "latency-metrics",
+        "scalability",
+        "observability"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Section 1: Key Concepts"
+        },
+        {
+          "depth": 3,
+          "text": "Power of Two"
+        },
+        {
+          "depth": 3,
+          "text": "Latency Numbers Every Programmer Should Know"
+        },
+        {
+          "depth": 3,
+          "text": "Availability Numbers"
+        },
+        {
+          "depth": 2,
+          "text": "Section 2: Example Estimation - Twitter QPS and Storage Requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Assumptions"
+        },
+        {
+          "depth": 3,
+          "text": "Estimations"
+        },
+        {
+          "depth": 2,
+          "text": "Section 3: Tips for Effective Estimation"
+        },
+        {
+          "depth": 3,
+          "text": "1. Rounding and Approximation"
+        },
+        {
+          "depth": 3,
+          "text": "2. Write Down Assumptions"
+        },
+        {
+          "depth": 3,
+          "text": "3. Label Units"
+        },
+        {
+          "depth": 3,
+          "text": "4. Common Estimation Scenarios"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch02-back-of-the-envelope-estimation/images/power-of-two.png",
+          "alt": "power-of-two",
+          "section": "Power of Two"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 500,
+      "readingMinutes": 3
+    },
+    {
+      "slug": "ch03-system-design-framework",
+      "number": 3,
+      "volume": 1,
+      "title": "A Framework for System Design Interviews",
+      "summary": "System design interviews are a key part of the hiring process, simulating real-life problem-solving scenarios. These interviews evaluate not just technical skills but also collaboration, communication, and the ability to handle ambiguous requirements.",
+      "concepts": [
+        "scalability",
+        "api-design",
+        "reliability"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understand the Problem and Establish Design Scope"
+        },
+        {
+          "depth": 3,
+          "text": "Key Objectives"
+        },
+        {
+          "depth": 3,
+          "text": "Approach"
+        },
+        {
+          "depth": 3,
+          "text": "Example"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "depth": 3,
+          "text": "Key Objectives"
+        },
+        {
+          "depth": 3,
+          "text": "Approach"
+        },
+        {
+          "depth": 3,
+          "text": "Example"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "Key Objectives"
+        },
+        {
+          "depth": 3,
+          "text": "Approach"
+        },
+        {
+          "depth": 3,
+          "text": "Example Topics"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Wrap-Up"
+        },
+        {
+          "depth": 3,
+          "text": "Key Objectives"
+        },
+        {
+          "depth": 3,
+          "text": "Approach"
+        },
+        {
+          "depth": 2,
+          "text": "Best Practices"
+        },
+        {
+          "depth": 3,
+          "text": "Dos"
+        },
+        {
+          "depth": 3,
+          "text": "Don’ts"
+        },
+        {
+          "depth": 2,
+          "text": "Time Management"
+        },
+        {
+          "depth": 3,
+          "text": "Suggested Time Allocation (for 45-Minute Interviews):"
+        }
+      ],
+      "figures": [],
+      "unreferencedImages": [],
+      "wordCount": 503,
+      "readingMinutes": 3
+    },
+    {
+      "slug": "ch04-rate-limiter",
+      "number": 4,
+      "volume": 1,
+      "title": "Design a Rate Limiter",
+      "summary": "This chapter explores the design and implementation of a rate limiter—a system component used to control traffic rates sent by clients or services. Rate limiters are crucial for preventing abuse, reducing costs, and ensuring the stability of server resources.",
+      "concepts": [
+        "rate-limiting",
+        "reliability",
+        "databases"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Benefits of Rate Limiting"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understanding the Problem"
+        },
+        {
+          "depth": 3,
+          "text": "Key Features"
+        },
+        {
+          "depth": 3,
+          "text": "Requirements"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: High-Level Design"
+        },
+        {
+          "depth": 3,
+          "text": "Placement Options"
+        },
+        {
+          "depth": 3,
+          "text": "Guidelines for Placement"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Rate Limiting Algorithms"
+        },
+        {
+          "depth": 3,
+          "text": "1. Token Bucket"
+        },
+        {
+          "depth": 3,
+          "text": "2. Leaking Bucket"
+        },
+        {
+          "depth": 3,
+          "text": "3. Fixed Window Counter"
+        },
+        {
+          "depth": 3,
+          "text": "4. Sliding Window Log"
+        },
+        {
+          "depth": 3,
+          "text": "5. Sliding Window Counter"
+        },
+        {
+          "depth": 2,
+          "text": "High-Level Architecture"
+        },
+        {
+          "depth": 2,
+          "text": "Advanced Considerations"
+        },
+        {
+          "depth": 3,
+          "text": "Distributed Environments"
+        },
+        {
+          "depth": 3,
+          "text": "Performance Optimizations"
+        },
+        {
+          "depth": 3,
+          "text": "Monitoring"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch04-rate-limiter/images/rate_limiter_architecture.png",
+          "alt": "Rate Limiting Middleware Architecture",
+          "section": "Placement Options"
+        },
+        {
+          "src": "/chapters/ch04-rate-limiter/images/token-bucket.png",
+          "alt": "Token Bucket Algorithm",
+          "section": "1. Token Bucket"
+        },
+        {
+          "src": "/chapters/ch04-rate-limiter/images/leaking-bucket.png",
+          "alt": "Leaking Bucket Algorithm",
+          "section": "2. Leaking Bucket"
+        },
+        {
+          "src": "/chapters/ch04-rate-limiter/images/fixed-window-counter.png",
+          "alt": "Fixed Window Counter",
+          "section": "3. Fixed Window Counter"
+        },
+        {
+          "src": "/chapters/ch04-rate-limiter/images/fixed-window-issue.png",
+          "alt": "Fixed Window Issue",
+          "section": "3. Fixed Window Counter"
+        },
+        {
+          "src": "/chapters/ch04-rate-limiter/images/sliding-window-log.png",
+          "alt": "Sliding Window Log",
+          "section": "4. Sliding Window Log"
+        },
+        {
+          "src": "/chapters/ch04-rate-limiter/images/sliding-window-counter.png",
+          "alt": "Fixed Window Counter",
+          "section": "5. Sliding Window Counter"
+        },
+        {
+          "src": "/chapters/ch04-rate-limiter/images/architecture.png",
+          "alt": "Architecture",
+          "section": "High-Level Architecture"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 459,
+      "readingMinutes": 3
+    },
+    {
+      "slug": "ch05-consistent-hashing",
+      "number": 5,
+      "volume": 1,
+      "title": "Design Consistent Hashing",
+      "summary": "This chapter explores consistent hashing, a technique essential for achieving horizontal scaling by efficiently distributing requests and data across servers. It minimizes data redistribution when servers are added or removed and ensures an even distribution of data to mitigate issues like server hotspots.",
+      "concepts": [
+        "sharding",
+        "scalability",
+        "load-balancing"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "The Rehashing Problem"
+        },
+        {
+          "depth": 3,
+          "text": "Explanation"
+        },
+        {
+          "depth": 3,
+          "text": "Key Issue"
+        },
+        {
+          "depth": 2,
+          "text": "Consistent Hashing"
+        },
+        {
+          "depth": 3,
+          "text": "Definition"
+        },
+        {
+          "depth": 3,
+          "text": "Key Concepts"
+        },
+        {
+          "depth": 2,
+          "text": "Challenges and Solutions"
+        },
+        {
+          "depth": 3,
+          "text": "Two Issues in Basic Approach"
+        },
+        {
+          "depth": 3,
+          "text": "Solution: Virtual Nodes"
+        },
+        {
+          "depth": 2,
+          "text": "Affected Keys"
+        },
+        {
+          "depth": 2,
+          "text": "Benefits of Consistent Hashing"
+        },
+        {
+          "depth": 2,
+          "text": "Real-World Applications"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch05-consistent-hashing/images/server-hashing.png",
+          "alt": "Server hashing",
+          "section": "Explanation"
+        },
+        {
+          "src": "/chapters/ch05-consistent-hashing/images/server-hashing-miss.png",
+          "alt": "Server hashing Miss",
+          "section": "Explanation"
+        },
+        {
+          "src": "/chapters/ch05-consistent-hashing/images/hash-ring.png",
+          "alt": "Hash Ring",
+          "section": "Key Concepts"
+        },
+        {
+          "src": "/chapters/ch05-consistent-hashing/images/server-ring.png",
+          "alt": "Server Ring",
+          "section": "Key Concepts"
+        },
+        {
+          "src": "/chapters/ch05-consistent-hashing/images/server-lookup.png",
+          "alt": "Server Lookup",
+          "section": "Key Concepts"
+        },
+        {
+          "src": "/chapters/ch05-consistent-hashing/images/adding-server.png",
+          "alt": "Adding Server",
+          "section": "Key Concepts"
+        },
+        {
+          "src": "/chapters/ch05-consistent-hashing/images/removing-server.png",
+          "alt": "Removing Server",
+          "section": "Key Concepts"
+        },
+        {
+          "src": "/chapters/ch05-consistent-hashing/images/virtual-nodes.png",
+          "alt": "Virtual Nodes",
+          "section": "Solution: Virtual Nodes"
+        },
+        {
+          "src": "/chapters/ch05-consistent-hashing/images/server-addition.png",
+          "alt": "Server Addition",
+          "section": "Affected Keys"
+        },
+        {
+          "src": "/chapters/ch05-consistent-hashing/images/server-removed.png",
+          "alt": "Server Removed",
+          "section": "Affected Keys"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 526,
+      "readingMinutes": 3
+    },
+    {
+      "slug": "ch06-key-value-store",
+      "number": 6,
+      "volume": 1,
+      "title": "Design a Key-Value Store",
+      "summary": "A key-value store is a type of non-relational database where data is stored as key-value pairs. Each key is unique, and values are accessed using these keys.",
+      "concepts": [
+        "consistency",
+        "databases",
+        "replication",
+        "durability"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 3,
+          "text": "Characteristics of the Design"
+        },
+        {
+          "depth": 2,
+          "text": "Single Server Key-Value Store"
+        },
+        {
+          "depth": 3,
+          "text": "Implementation"
+        },
+        {
+          "depth": 3,
+          "text": "Limitation"
+        },
+        {
+          "depth": 2,
+          "text": "Distributed Key-Value Store"
+        },
+        {
+          "depth": 3,
+          "text": "CAP Theorem"
+        },
+        {
+          "depth": 2,
+          "text": "System Components"
+        },
+        {
+          "depth": 3,
+          "text": "1. Data Partitioning"
+        },
+        {
+          "depth": 3,
+          "text": "2. Data Replication"
+        },
+        {
+          "depth": 3,
+          "text": "3. Consistency"
+        },
+        {
+          "depth": 3,
+          "text": "4. Inconsistency Resolution"
+        },
+        {
+          "depth": 3,
+          "text": "5. Handling Failures"
+        },
+        {
+          "depth": 3,
+          "text": "6. Handling Data Center Outages"
+        },
+        {
+          "depth": 2,
+          "text": "Write and Read Paths"
+        },
+        {
+          "depth": 3,
+          "text": "1. Write Path (Based on Cassandra architecture)"
+        },
+        {
+          "depth": 3,
+          "text": "2. Read Path"
+        },
+        {
+          "depth": 2,
+          "text": "Final Architecture"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch06-key-value-store/images/cap.png",
+          "alt": "CAP",
+          "section": "CAP Theorem"
+        },
+        {
+          "src": "/chapters/ch06-key-value-store/images/server-down.png",
+          "alt": "Server down",
+          "section": "CAP Theorem"
+        },
+        {
+          "src": "/chapters/ch06-key-value-store/images/data-replication.png",
+          "alt": "Data replication",
+          "section": "2. Data Replication"
+        },
+        {
+          "src": "/chapters/ch06-key-value-store/images/quorum-consensus.png",
+          "alt": "Quorum consensus",
+          "section": "3. Consistency"
+        },
+        {
+          "src": "/chapters/ch06-key-value-store/images/consistent-server.png",
+          "alt": "Consisten hashing",
+          "section": "4. Inconsistency Resolution"
+        },
+        {
+          "src": "/chapters/ch06-key-value-store/images/inconsistent-server.png",
+          "alt": "Inconsistent server",
+          "section": "4. Inconsistency Resolution"
+        },
+        {
+          "src": "/chapters/ch06-key-value-store/images/vector-clock.png",
+          "alt": "Server hashing",
+          "section": "4. Inconsistency Resolution"
+        },
+        {
+          "src": "/chapters/ch06-key-value-store/images/gossip-protocol.png",
+          "alt": "Gossip protocol",
+          "section": "5. Handling Failures"
+        },
+        {
+          "src": "/chapters/ch06-key-value-store/images/sloppy-quorum.png",
+          "alt": "Sloppy Quorum",
+          "section": "5. Handling Failures"
+        },
+        {
+          "src": "/chapters/ch06-key-value-store/images/key-bucket.png",
+          "alt": "Key Bucket",
+          "section": "5. Handling Failures"
+        },
+        {
+          "src": "/chapters/ch06-key-value-store/images/hash-key-bucket.png",
+          "alt": "Hash Key Bucket",
+          "section": "5. Handling Failures"
+        },
+        {
+          "src": "/chapters/ch06-key-value-store/images/hash-bucket.png",
+          "alt": "Hash Bucket",
+          "section": "5. Handling Failures"
+        },
+        {
+          "src": "/chapters/ch06-key-value-store/images/merkel-tree.png",
+          "alt": "Merkel Tree",
+          "section": "5. Handling Failures"
+        },
+        {
+          "src": "/chapters/ch06-key-value-store/images/write-path.png",
+          "alt": "Hash Bucket",
+          "section": "1. Write Path (Based on Cassandra architecture)"
+        },
+        {
+          "src": "/chapters/ch06-key-value-store/images/read-path.png",
+          "alt": "Hash Bucket",
+          "section": "2. Read Path"
+        },
+        {
+          "src": "/chapters/ch06-key-value-store/images/read-path-without-cache.png",
+          "alt": "Hash Bucket",
+          "section": "2. Read Path"
+        },
+        {
+          "src": "/chapters/ch06-key-value-store/images/final-architecture.png",
+          "alt": "Hash Bucket",
+          "section": "Final Architecture"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 1489,
+      "readingMinutes": 7
+    },
+    {
+      "slug": "ch07-unique-id-generator",
+      "number": 7,
+      "volume": 1,
+      "title": "Design a Unique ID Generator in Distributed Systems",
+      "summary": "This chapter addresses the challenge of designing a unique ID generator for distributed systems. Traditional auto-increment keys are unsuitable in distributed environments due to scalability and synchronization challenges.",
+      "concepts": [
+        "scalability",
+        "databases",
+        "consistency"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understanding the Problem"
+        },
+        {
+          "depth": 3,
+          "text": "Basic Requirements"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: High-Level Design Options"
+        },
+        {
+          "depth": 3,
+          "text": "1. Multi-Master Replication"
+        },
+        {
+          "depth": 3,
+          "text": "2. UUID (Universally Unique Identifier)"
+        },
+        {
+          "depth": 3,
+          "text": "3. Ticket Server"
+        },
+        {
+          "depth": 3,
+          "text": "4. Twitter Snowflake Approach"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Additional Considerations"
+        },
+        {
+          "depth": 3,
+          "text": "1. Clock Synchronization"
+        },
+        {
+          "depth": 3,
+          "text": "2. Section Length Tuning"
+        },
+        {
+          "depth": 3,
+          "text": "3. High Availability"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch07-unique-id-generator/images/multi-master.png",
+          "alt": "Multi Master",
+          "section": "1. Multi-Master Replication"
+        },
+        {
+          "src": "/chapters/ch07-unique-id-generator/images/uuid.png",
+          "alt": "UUID generator",
+          "section": "2. UUID (Universally Unique Identifier)"
+        },
+        {
+          "src": "/chapters/ch07-unique-id-generator/images/ticket-server.png",
+          "alt": "UUID generator",
+          "section": "3. Ticket Server"
+        },
+        {
+          "src": "/chapters/ch07-unique-id-generator/images/twitter-snowflake.png",
+          "alt": "Snowflake approach",
+          "section": "4. Twitter Snowflake Approach"
+        },
+        {
+          "src": "/chapters/ch07-unique-id-generator/images/snowflake-id-breakdown.png",
+          "alt": "Snowflake ID breakdow",
+          "section": "4. Twitter Snowflake Approach"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 441,
+      "readingMinutes": 3
+    },
+    {
+      "slug": "ch08-url-shortener",
+      "number": 8,
+      "volume": 1,
+      "title": "Design a URL Shortener",
+      "summary": "This chapter discusses the design of a URL shortening service like TinyURL. The system's main goals include URL shortening, redirecting, and high scalability to handle large traffic volumes.",
+      "concepts": [
+        "api-design",
+        "databases",
+        "caching",
+        "sharding"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 3,
+          "text": "Requirements"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: High-Level Design"
+        },
+        {
+          "depth": 3,
+          "text": "API Endpoints"
+        },
+        {
+          "depth": 3,
+          "text": "URL Redirection"
+        },
+        {
+          "depth": 3,
+          "text": "URL Shortening"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: Deep Dive into Design"
+        },
+        {
+          "depth": 3,
+          "text": "Data Model"
+        },
+        {
+          "depth": 3,
+          "text": "Hash Function"
+        },
+        {
+          "depth": 3,
+          "text": "Comparison"
+        },
+        {
+          "depth": 3,
+          "text": "URL Shortening Flow"
+        },
+        {
+          "depth": 3,
+          "text": "URL Redirecting Flow"
+        },
+        {
+          "depth": 2,
+          "text": "Additional Considerations"
+        },
+        {
+          "depth": 3,
+          "text": "Rate Limiter"
+        },
+        {
+          "depth": 3,
+          "text": "Scalability"
+        },
+        {
+          "depth": 3,
+          "text": "Analytics"
+        },
+        {
+          "depth": 3,
+          "text": "High Availability and Reliability"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch08-url-shortener/images/url-redirection.png",
+          "alt": "URL Redirection",
+          "section": "API Endpoints"
+        },
+        {
+          "src": "/chapters/ch08-url-shortener/images/url-shortening.png",
+          "alt": "URL Shortening",
+          "section": "URL Shortening"
+        },
+        {
+          "src": "/chapters/ch08-url-shortener/images/table-schema.png",
+          "alt": "Table Schema",
+          "section": "Data Model"
+        },
+        {
+          "src": "/chapters/ch08-url-shortener/images/hash-function.png",
+          "alt": "Hash Function",
+          "section": "Hash Function"
+        },
+        {
+          "src": "/chapters/ch08-url-shortener/images/url-lookup.png",
+          "alt": "URL Lookup",
+          "section": "Hash Function"
+        },
+        {
+          "src": "/chapters/ch08-url-shortener/images/url-shortening-flow.png",
+          "alt": "URL Shortening",
+          "section": "URL Shortening Flow"
+        },
+        {
+          "src": "/chapters/ch08-url-shortener/images/url-redirecting-flow.png",
+          "alt": "URL Shortening",
+          "section": "URL Redirecting Flow"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 595,
+      "readingMinutes": 3
+    },
+    {
+      "slug": "ch09-web-crawler",
+      "number": 9,
+      "volume": 1,
+      "title": "Design a Web Crawler",
+      "summary": "A web crawler, also known as a spider or robot, is used to discover and collect web content, such as web pages, images, and videos. This chapter focuses on designing a scalable web crawler for search engine indexing.",
+      "concepts": [
+        "scalability",
+        "queues",
+        "reliability",
+        "sharding"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 3,
+          "text": "Applications of Web Crawlers"
+        },
+        {
+          "depth": 3,
+          "text": "Design Challenges"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understanding the Problem"
+        },
+        {
+          "depth": 3,
+          "text": "Requirements"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: High-Level Design"
+        },
+        {
+          "depth": 3,
+          "text": "Components"
+        },
+        {
+          "depth": 3,
+          "text": "Workflow"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Deep Dive into Key Components"
+        },
+        {
+          "depth": 3,
+          "text": "DFS/BFS"
+        },
+        {
+          "depth": 3,
+          "text": "URL Frontier"
+        },
+        {
+          "depth": 3,
+          "text": "HTML Downloader"
+        },
+        {
+          "depth": 3,
+          "text": "Robustness"
+        },
+        {
+          "depth": 3,
+          "text": "Extensibility"
+        },
+        {
+          "depth": 3,
+          "text": "Avoiding Problematic Content"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Wrap Up"
+        },
+        {
+          "depth": 3,
+          "text": "Key Takeaways"
+        },
+        {
+          "depth": 3,
+          "text": "Additional Considerations"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch09-web-crawler/images/web-crawler-architecture.png",
+          "alt": "Web Crawler Architecture",
+          "section": "Components"
+        },
+        {
+          "src": "/chapters/ch09-web-crawler/images/politeness.png",
+          "alt": "Politeness",
+          "section": "URL Frontier"
+        },
+        {
+          "src": "/chapters/ch09-web-crawler/images/prioritizer.png",
+          "alt": "Politeness",
+          "section": "URL Frontier"
+        },
+        {
+          "src": "/chapters/ch09-web-crawler/images/extensibility.png",
+          "alt": "Politeness",
+          "section": "Extensibility"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 903,
+      "readingMinutes": 5
+    },
+    {
+      "slug": "ch10-notification-system",
+      "number": 10,
+      "volume": 1,
+      "title": "Design a Notification System",
+      "summary": "A notification system is essential for modern applications, providing timely updates like product notifications, events, offers, and alerts. Notifications can be sent through: 1.",
+      "concepts": [
+        "queues",
+        "reliability",
+        "rate-limiting",
+        "api-design"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understanding the Problem"
+        },
+        {
+          "depth": 3,
+          "text": "Requirements"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: High-Level Design"
+        },
+        {
+          "depth": 3,
+          "text": "Components"
+        },
+        {
+          "depth": 3,
+          "text": "Challenges in Initial Design"
+        },
+        {
+          "depth": 3,
+          "text": "Improved Design"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "Reliability"
+        },
+        {
+          "depth": 3,
+          "text": "Additional Components"
+        },
+        {
+          "depth": 3,
+          "text": "Security"
+        },
+        {
+          "depth": 3,
+          "text": "Notification Flow"
+        },
+        {
+          "depth": 2,
+          "text": "Key Optimizations"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch10-notification-system/images/contact-info-gathering.png",
+          "alt": "Contact Info Gathering",
+          "section": "Components"
+        },
+        {
+          "src": "/chapters/ch10-notification-system/images/high-level-design.png",
+          "alt": "High Level Design",
+          "section": "Components"
+        },
+        {
+          "src": "/chapters/ch10-notification-system/images/improved-design.png",
+          "alt": "Improved Design",
+          "section": "Improved Design"
+        },
+        {
+          "src": "/chapters/ch10-notification-system/images/data-loss.png",
+          "alt": "Data Loss",
+          "section": "Reliability"
+        },
+        {
+          "src": "/chapters/ch10-notification-system/images/events-tracking.png",
+          "alt": "Events Tracking",
+          "section": "Additional Components"
+        },
+        {
+          "src": "/chapters/ch10-notification-system/images/updated-design.png",
+          "alt": "Updated Design",
+          "section": "Notification Flow"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 621,
+      "readingMinutes": 3
+    },
+    {
+      "slug": "ch11-news-feed-system",
+      "number": 11,
+      "volume": 1,
+      "title": "Design a News Feed System",
+      "summary": "A news feed system displays a constantly updating list of posts (status updates, photos, videos, and links) from a user’s connections. Examples include Facebook’s news feed, Instagram’s feed, and Twitter’s timeline.",
+      "concepts": [
+        "caching",
+        "queues",
+        "scalability",
+        "databases"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understanding the Problem"
+        },
+        {
+          "depth": 3,
+          "text": "Requirements"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: High-Level Design"
+        },
+        {
+          "depth": 3,
+          "text": "Overview"
+        },
+        {
+          "depth": 3,
+          "text": "News Feed APIs"
+        },
+        {
+          "depth": 3,
+          "text": "Feed Publishing"
+        },
+        {
+          "depth": 3,
+          "text": "News Feed Building"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "Feed Publishing Deep Dive"
+        },
+        {
+          "depth": 2,
+          "text": "News Feed Retrieval Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "Cache Architecture"
+        },
+        {
+          "depth": 2,
+          "text": "Key Optimizations"
+        },
+        {
+          "depth": 3,
+          "text": "Scaling"
+        },
+        {
+          "depth": 3,
+          "text": "Caching"
+        },
+        {
+          "depth": 3,
+          "text": "Reliability"
+        },
+        {
+          "depth": 3,
+          "text": "Monitoring"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch11-news-feed-system/images/feed-publishing.png",
+          "alt": "Feed Publishing",
+          "section": "Feed Publishing"
+        },
+        {
+          "src": "/chapters/ch11-news-feed-system/images/news-feed-building.png",
+          "alt": "News Feed Building",
+          "section": "News Feed Building"
+        },
+        {
+          "src": "/chapters/ch11-news-feed-system/images/feed-publishing-deep-dive.png",
+          "alt": "Feed Publishing Deep Dive",
+          "section": "Feed Publishing Deep Dive"
+        },
+        {
+          "src": "/chapters/ch11-news-feed-system/images/fanout-service.png",
+          "alt": "Fanout Service",
+          "section": "Feed Publishing Deep Dive"
+        },
+        {
+          "src": "/chapters/ch11-news-feed-system/images/cache-architecture.png",
+          "alt": "Cache Architecture",
+          "section": "Cache Architecture"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 697,
+      "readingMinutes": 4
+    },
+    {
+      "slug": "ch12-chat-system",
+      "number": 12,
+      "volume": 1,
+      "title": "Design a Chat System",
+      "summary": "A chat system supports real-time messaging between users. This chapter focuses on designing a chat app that includes:",
+      "concepts": [
+        "databases",
+        "queues",
+        "api-design",
+        "scalability"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understanding the Problem"
+        },
+        {
+          "depth": 3,
+          "text": "Requirements"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: High-Level Design"
+        },
+        {
+          "depth": 3,
+          "text": "Communication Protocols"
+        },
+        {
+          "depth": 3,
+          "text": "Components"
+        },
+        {
+          "depth": 3,
+          "text": "Design"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "Service Discovery"
+        },
+        {
+          "depth": 3,
+          "text": "Messaging Flows"
+        },
+        {
+          "depth": 3,
+          "text": "Online Presence"
+        },
+        {
+          "depth": 2,
+          "text": "Additional Considerations"
+        },
+        {
+          "depth": 3,
+          "text": "Scalability"
+        },
+        {
+          "depth": 3,
+          "text": "Error Handling"
+        },
+        {
+          "depth": 3,
+          "text": "Future Extensions"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch12-chat-system/images/basic-design.png",
+          "alt": "Basic Design",
+          "section": "Communication Protocols"
+        },
+        {
+          "src": "/chapters/ch12-chat-system/images/polling.png",
+          "alt": "Polling",
+          "section": "Communication Protocols"
+        },
+        {
+          "src": "/chapters/ch12-chat-system/images/long-polling.png",
+          "alt": "Long Polling",
+          "section": "Communication Protocols"
+        },
+        {
+          "src": "/chapters/ch12-chat-system/images/websocket.png",
+          "alt": "Websocket",
+          "section": "Communication Protocols"
+        },
+        {
+          "src": "/chapters/ch12-chat-system/images/high-level-stateless-arch.png",
+          "alt": "High Level Architecture",
+          "section": "Components"
+        },
+        {
+          "src": "/chapters/ch12-chat-system/images/high-level-statefull-arch.png",
+          "alt": "High Level Architecture",
+          "section": "Components"
+        },
+        {
+          "src": "/chapters/ch12-chat-system/images/high-level-design.png",
+          "alt": "High Level Design",
+          "section": "Design"
+        },
+        {
+          "src": "/chapters/ch12-chat-system/images/one-to-one-chat.png",
+          "alt": "One to one chat design",
+          "section": "Design"
+        },
+        {
+          "src": "/chapters/ch12-chat-system/images/group-chat.png",
+          "alt": "Group chat design",
+          "section": "Design"
+        },
+        {
+          "src": "/chapters/ch12-chat-system/images/zookeeper.png",
+          "alt": "Zookeeper",
+          "section": "Service Discovery"
+        },
+        {
+          "src": "/chapters/ch12-chat-system/images/group-chat-flow.png",
+          "alt": "Group Chat Flow",
+          "section": "Messaging Flows"
+        },
+        {
+          "src": "/chapters/ch12-chat-system/images/message-synchronization.png",
+          "alt": "Message Synchronization",
+          "section": "Messaging Flows"
+        },
+        {
+          "src": "/chapters/ch12-chat-system/images/heartbeat-mechanism.png",
+          "alt": "Heartbeat Mechanism",
+          "section": "Online Presence"
+        },
+        {
+          "src": "/chapters/ch12-chat-system/images/fanout-presence.png",
+          "alt": "Fanout Presence",
+          "section": "Online Presence"
+        }
+      ],
+      "unreferencedImages": [
+        "/chapters/ch12-chat-system/images/one-to-one-chat-flow.png",
+        "/chapters/ch12-chat-system/images/online-presence.png"
+      ],
+      "wordCount": 882,
+      "readingMinutes": 5
+    },
+    {
+      "slug": "ch13-search-autocomplete",
+      "number": 13,
+      "volume": 1,
+      "title": "Design a Search Autocomplete System",
+      "summary": "Autocomplete, also known as typeahead or incremental search, provides real-time suggestions to users as they type in search boxes. The system must efficiently deliver top-k relevant and popular suggestions based on historical query data.",
+      "concepts": [
+        "caching",
+        "databases",
+        "sharding",
+        "scalability"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 3,
+          "text": "Key Features"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understanding the Problem"
+        },
+        {
+          "depth": 3,
+          "text": "Requirements"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: High-Level Design"
+        },
+        {
+          "depth": 3,
+          "text": "Data Gathering Service"
+        },
+        {
+          "depth": 3,
+          "text": "Query Service"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "Trie Data Structure"
+        },
+        {
+          "depth": 3,
+          "text": "Query Processing Flow"
+        },
+        {
+          "depth": 3,
+          "text": "Optimizations"
+        },
+        {
+          "depth": 3,
+          "text": "Data Gathering Pipeline"
+        },
+        {
+          "depth": 3,
+          "text": "Scalability"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Advanced Features"
+        },
+        {
+          "depth": 3,
+          "text": "Multi-Language Support"
+        },
+        {
+          "depth": 3,
+          "text": "Trending Queries"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch13-search-autocomplete/images/data-gathering.png",
+          "alt": "Data Gathering",
+          "section": "Data Gathering Service"
+        },
+        {
+          "src": "/chapters/ch13-search-autocomplete/images/frequency-table.png",
+          "alt": "Frequency Table",
+          "section": "Query Service"
+        },
+        {
+          "src": "/chapters/ch13-search-autocomplete/images/basic-search-suggestions.png",
+          "alt": "Search Suggestions",
+          "section": "Query Service"
+        },
+        {
+          "src": "/chapters/ch13-search-autocomplete/images/trie-structure.png",
+          "alt": "Trie Structure",
+          "section": "Trie Data Structure"
+        },
+        {
+          "src": "/chapters/ch13-search-autocomplete/images/cached-trie.png",
+          "alt": "Cached Trie",
+          "section": "Trie Data Structure"
+        },
+        {
+          "src": "/chapters/ch13-search-autocomplete/images/delete-kv.png",
+          "alt": "Delete KV",
+          "section": "Trie Data Structure"
+        },
+        {
+          "src": "/chapters/ch13-search-autocomplete/images/data-gathering-flow.png",
+          "alt": "Updated Data Gathering Flow",
+          "section": "Data Gathering Pipeline"
+        },
+        {
+          "src": "/chapters/ch13-search-autocomplete/images/trie-db.png",
+          "alt": "Trie DB",
+          "section": "Data Gathering Pipeline"
+        },
+        {
+          "src": "/chapters/ch13-search-autocomplete/images/sharding.png",
+          "alt": "Sharding",
+          "section": "Scalability"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 876,
+      "readingMinutes": 4
+    },
+    {
+      "slug": "ch14-youtube",
+      "number": 14,
+      "volume": 1,
+      "title": "Design YouTube",
+      "summary": "YouTube is a massive video streaming platform supporting video uploads, playback, and various interactions. This chapter focuses on designing a scalable video streaming system with the following core features:",
+      "concepts": [
+        "cdn",
+        "queues",
+        "databases",
+        "scalability"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 3,
+          "text": "Key Statistics (2020)"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understand the Problem and Scope"
+        },
+        {
+          "depth": 3,
+          "text": "Core Functionalities"
+        },
+        {
+          "depth": 3,
+          "text": "Supported Platforms"
+        },
+        {
+          "depth": 3,
+          "text": "Assumptions"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: High-Level Design"
+        },
+        {
+          "depth": 3,
+          "text": "Components"
+        },
+        {
+          "depth": 3,
+          "text": "Core Workflows"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "Video Transcoding"
+        },
+        {
+          "depth": 3,
+          "text": "Video Transcoding Architecture"
+        },
+        {
+          "depth": 2,
+          "text": "System Optimizations"
+        },
+        {
+          "depth": 3,
+          "text": "Speed Optimizations"
+        },
+        {
+          "depth": 3,
+          "text": "Safety Optimizations"
+        },
+        {
+          "depth": 3,
+          "text": "Cost-Saving Optimizations"
+        },
+        {
+          "depth": 2,
+          "text": "Error Handling"
+        },
+        {
+          "depth": 3,
+          "text": "Recoverable Errors"
+        },
+        {
+          "depth": 3,
+          "text": "Non-Recoverable Errors"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch14-youtube/images/high-level-design.png",
+          "alt": "High Level Design",
+          "section": "Components"
+        },
+        {
+          "src": "/chapters/ch14-youtube/images/video-uploading-flow.png",
+          "alt": "Video Upload Flow",
+          "section": "Core Workflows"
+        },
+        {
+          "src": "/chapters/ch14-youtube/images/metadata-upload.png",
+          "alt": "Metadata Upload",
+          "section": "Core Workflows"
+        },
+        {
+          "src": "/chapters/ch14-youtube/images/video-streaming-flow.png",
+          "alt": "Video Streaming Flow",
+          "section": "Core Workflows"
+        },
+        {
+          "src": "/chapters/ch14-youtube/images/dag-video-transcoding.png",
+          "alt": "DAG Video Transcoding",
+          "section": "Video Transcoding"
+        },
+        {
+          "src": "/chapters/ch14-youtube/images/video-transcoding-architecture.png",
+          "alt": "Video Transcoding",
+          "section": "Video Transcoding Architecture"
+        },
+        {
+          "src": "/chapters/ch14-youtube/images/dag-config.png",
+          "alt": "DAG Config",
+          "section": "Video Transcoding Architecture"
+        },
+        {
+          "src": "/chapters/ch14-youtube/images/dag-scheduler.png",
+          "alt": "DAG Scheduler",
+          "section": "Video Transcoding Architecture"
+        },
+        {
+          "src": "/chapters/ch14-youtube/images/resource-manager.png",
+          "alt": "Resource Manager",
+          "section": "Video Transcoding Architecture"
+        },
+        {
+          "src": "/chapters/ch14-youtube/images/task-worker.png",
+          "alt": "Task Worker",
+          "section": "Video Transcoding Architecture"
+        },
+        {
+          "src": "/chapters/ch14-youtube/images/video-split.png",
+          "alt": "Video Split",
+          "section": "Speed Optimizations"
+        },
+        {
+          "src": "/chapters/ch14-youtube/images/message-queue1.png",
+          "alt": "Message Queue",
+          "section": "Speed Optimizations"
+        },
+        {
+          "src": "/chapters/ch14-youtube/images/message-queue2.png",
+          "alt": "Message Queue",
+          "section": "Speed Optimizations"
+        },
+        {
+          "src": "/chapters/ch14-youtube/images/pres-signed-urls.png",
+          "alt": "Pre Signed",
+          "section": "Safety Optimizations"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 893,
+      "readingMinutes": 5
+    },
+    {
+      "slug": "ch15-google-drive",
+      "number": 15,
+      "volume": 1,
+      "title": "Design Google Drive",
+      "summary": "Google Drive is a cloud-based file storage and synchronization service that allows users to store, access, and share files from various devices. This chapter discusses designing a scalable system with the following features:",
+      "concepts": [
+        "databases",
+        "durability",
+        "reliability",
+        "consistency"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understanding the Problem"
+        },
+        {
+          "depth": 3,
+          "text": "Key Requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Constraints and Assumptions"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: High-Level Design"
+        },
+        {
+          "depth": 3,
+          "text": "Single-Server Setup"
+        },
+        {
+          "depth": 3,
+          "text": "Moving to Distributed Systems"
+        },
+        {
+          "depth": 3,
+          "text": "Improved design"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "Metadata Database"
+        },
+        {
+          "depth": 3,
+          "text": "File Upload Flow"
+        },
+        {
+          "depth": 3,
+          "text": "File Sync"
+        },
+        {
+          "depth": 3,
+          "text": "File Download Flow"
+        },
+        {
+          "depth": 3,
+          "text": "Notification Service"
+        },
+        {
+          "depth": 3,
+          "text": "Storage Optimization"
+        },
+        {
+          "depth": 3,
+          "text": "Failure Handling"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch15-google-drive/images/namespaces.png",
+          "alt": "Namespaces",
+          "section": "Single-Server Setup"
+        },
+        {
+          "src": "/chapters/ch15-google-drive/images/replication.png",
+          "alt": "Replication",
+          "section": "Moving to Distributed Systems"
+        },
+        {
+          "src": "/chapters/ch15-google-drive/images/sync-conflicts.png",
+          "alt": "Sync Conflicts",
+          "section": "Moving to Distributed Systems"
+        },
+        {
+          "src": "/chapters/ch15-google-drive/images/high-level-design.png",
+          "alt": "High Level Design",
+          "section": "Improved design"
+        },
+        {
+          "src": "/chapters/ch15-google-drive/images/metadata-database.png",
+          "alt": "Metadata Database ",
+          "section": "Metadata Database"
+        },
+        {
+          "src": "/chapters/ch15-google-drive/images/upload-flow.png",
+          "alt": "Upload Flow ",
+          "section": "File Upload Flow"
+        },
+        {
+          "src": "/chapters/ch15-google-drive/images/delta-sync.png",
+          "alt": "Delta Sync",
+          "section": "File Sync"
+        },
+        {
+          "src": "/chapters/ch15-google-drive/images/file-sync.png",
+          "alt": "File Synce ",
+          "section": "File Sync"
+        },
+        {
+          "src": "/chapters/ch15-google-drive/images/download-flow.png",
+          "alt": "Upload Flow ",
+          "section": "File Download Flow"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 1126,
+      "readingMinutes": 6
+    },
+    {
+      "slug": "ch16-proximity-service",
+      "number": 16,
+      "volume": 2,
+      "title": "Proximity Service",
+      "summary": "A proximity service is designed to find nearby locations, such as restaurants, hotels, gas stations, and other businesses. This functionality is used in applications like Google Maps and Yelp to help users discover places within a defined radius.",
+      "concepts": [
+        "scalability",
+        "caching",
+        "databases",
+        "sharding"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understanding the Problem and Establishing Scope"
+        },
+        {
+          "depth": 3,
+          "text": "Functional Requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Non-Functional Requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Back-of-the-Envelope Estimation"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: High-Level Design"
+        },
+        {
+          "depth": 3,
+          "text": "API Design"
+        },
+        {
+          "depth": 3,
+          "text": "Data Model"
+        },
+        {
+          "depth": 3,
+          "text": "Data Schema"
+        },
+        {
+          "depth": 3,
+          "text": "High-Level System Architecture"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Algorithms for Fetching Nearby Businesses"
+        },
+        {
+          "depth": 3,
+          "text": "Option 1: Two-Dimensional Search (Naive Approach)"
+        },
+        {
+          "depth": 3,
+          "text": "Better Approach"
+        },
+        {
+          "depth": 3,
+          "text": "Option 2: Evenly Divided Grid"
+        },
+        {
+          "depth": 3,
+          "text": "Option 3: Geohash"
+        },
+        {
+          "depth": 3,
+          "text": "Option 4: Quadtree"
+        },
+        {
+          "depth": 3,
+          "text": "Option 5: Google S2"
+        },
+        {
+          "depth": 2,
+          "text": "Tradeoff Comparison"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Scaling the Database and Caching Strategy"
+        },
+        {
+          "depth": 3,
+          "text": "Scaling the Business Table"
+        },
+        {
+          "depth": 3,
+          "text": "Scaling the Geospatial Index"
+        },
+        {
+          "depth": 3,
+          "text": "Cache Strategy"
+        },
+        {
+          "depth": 2,
+          "text": "Step 5: Deployment Strategy and Final Architecture"
+        },
+        {
+          "depth": 3,
+          "text": "Region and Availability Zones"
+        },
+        {
+          "depth": 3,
+          "text": "Handling Real-Time Updates"
+        },
+        {
+          "depth": 3,
+          "text": "Final System Architecture"
+        },
+        {
+          "depth": 2,
+          "text": "Steps to Retrieve Nearby Businesses"
+        },
+        {
+          "depth": 2,
+          "text": "Key Optimizations"
+        },
+        {
+          "depth": 3,
+          "text": "Choosing the Best Indexing Method"
+        },
+        {
+          "depth": 2,
+          "text": "References"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch16-proximity-service/images/high-level-design.png",
+          "alt": "HLD",
+          "section": "High-Level System Architecture"
+        },
+        {
+          "src": "/chapters/ch16-proximity-service/images/2d-search.png",
+          "alt": "2D",
+          "section": "Option 1: Two-Dimensional Search (Naive Approach)"
+        },
+        {
+          "src": "/chapters/ch16-proximity-service/images/geospatial-index-types.png",
+          "alt": "2D",
+          "section": "Better Approach"
+        },
+        {
+          "src": "/chapters/ch16-proximity-service/images/even-grid.png",
+          "alt": "Even Grid",
+          "section": "Option 2: Evenly Divided Grid"
+        },
+        {
+          "src": "/chapters/ch16-proximity-service/images/geohash.png",
+          "alt": "Geohash",
+          "section": "Option 3: Geohash"
+        },
+        {
+          "src": "/chapters/ch16-proximity-service/images/geohash-1.png",
+          "alt": "Geohash",
+          "section": "Option 3: Geohash"
+        },
+        {
+          "src": "/chapters/ch16-proximity-service/images/geohash-radius-mapping.png",
+          "alt": "Geohash Radius",
+          "section": "Option 3: Geohash"
+        },
+        {
+          "src": "/chapters/ch16-proximity-service/images/boundary-issue.png",
+          "alt": "Boundary Issue",
+          "section": "Option 3: Geohash"
+        },
+        {
+          "src": "/chapters/ch16-proximity-service/images/quadtree.png",
+          "alt": "Quadtree",
+          "section": "Option 4: Quadtree"
+        },
+        {
+          "src": "/chapters/ch16-proximity-service/images/building-quadtree.png",
+          "alt": "Building Quadtree",
+          "section": "Option 4: Quadtree"
+        },
+        {
+          "src": "/chapters/ch16-proximity-service/images/realworld-quadtree.png",
+          "alt": "Real World Quadtree",
+          "section": "Option 4: Quadtree"
+        },
+        {
+          "src": "/chapters/ch16-proximity-service/images/hilbert-curve.png",
+          "alt": "Hilbert curve",
+          "section": "Option 5: Google S2"
+        },
+        {
+          "src": "/chapters/ch16-proximity-service/images/geofence.png",
+          "alt": "Geofence",
+          "section": "Option 5: Google S2"
+        },
+        {
+          "src": "/chapters/ch16-proximity-service/images/final-design.png",
+          "alt": "Final Design",
+          "section": "Final System Architecture"
+        }
+      ],
+      "unreferencedImages": [
+        "/chapters/ch16-proximity-service/images/dataset-intersection.png"
+      ],
+      "wordCount": 1542,
+      "readingMinutes": 8
+    },
+    {
+      "slug": "ch17-nearby-friends",
+      "number": 17,
+      "volume": 2,
+      "title": "Nearby Friends",
+      "summary": "This chapter focuses on designing a scalable backend for an application which enables user to share their location and discover friends who are nearby.",
+      "concepts": [
+        "scalability",
+        "queues",
+        "caching",
+        "reliability"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understand the Problem and Establish Design Scope"
+        },
+        {
+          "depth": 3,
+          "text": "Functional requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Non-functional requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Back-of-the-envelope"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "depth": 3,
+          "text": "High-level design"
+        },
+        {
+          "depth": 3,
+          "text": "Periodic location update"
+        },
+        {
+          "depth": 3,
+          "text": "API Design"
+        },
+        {
+          "depth": 3,
+          "text": "Data model"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "How well does each component scale?"
+        },
+        {
+          "depth": 3,
+          "text": "Scaling deep-dive on redis pub/sub component"
+        },
+        {
+          "depth": 3,
+          "text": "Adding/removing friends"
+        },
+        {
+          "depth": 3,
+          "text": "Users with many friends"
+        },
+        {
+          "depth": 3,
+          "text": "Nearby random person"
+        },
+        {
+          "depth": 3,
+          "text": "Alternative to Redis pub/sub"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Wrap Up"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch17-nearby-friends/images/fan-out-backend.png",
+          "alt": "fan-out-backend",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch17-nearby-friends/images/simple-high-level-design.png",
+          "alt": "simple-high-level-design",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch17-nearby-friends/images/redis-pubsub-usage.png",
+          "alt": "redis-pubsub-usage",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch17-nearby-friends/images/periodic-location-update.png",
+          "alt": "periodic-location-update",
+          "section": "Periodic location update"
+        },
+        {
+          "src": "/chapters/ch17-nearby-friends/images/detailed-periodic-location-update.png",
+          "alt": "detailed-periodic-location-update",
+          "section": "Periodic location update"
+        },
+        {
+          "src": "/chapters/ch17-nearby-friends/images/channel-distribution-data.png",
+          "alt": "channel-distribution-data",
+          "section": "Scaling deep-dive on redis pub/sub component"
+        },
+        {
+          "src": "/chapters/ch17-nearby-friends/images/consistent-hashing.png",
+          "alt": "consistent-hashing",
+          "section": "Scaling deep-dive on redis pub/sub component"
+        },
+        {
+          "src": "/chapters/ch17-nearby-friends/images/geohash-pubsub.png",
+          "alt": "geohash-pubsub",
+          "section": "Nearby random person"
+        },
+        {
+          "src": "/chapters/ch17-nearby-friends/images/location-updates-geohash.png",
+          "alt": "location-updates-geohash",
+          "section": "Nearby random person"
+        },
+        {
+          "src": "/chapters/ch17-nearby-friends/images/geohash-borders.png",
+          "alt": "geohash-borders",
+          "section": "Nearby random person"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 1958,
+      "readingMinutes": 9
+    },
+    {
+      "slug": "ch18-google-maps",
+      "number": 18,
+      "volume": 2,
+      "title": "Google Maps",
+      "summary": "We'll design a simple version of Google Maps.",
+      "concepts": [
+        "cdn",
+        "scalability",
+        "databases",
+        "caching"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understand the Problem and Establish Design Scope"
+        },
+        {
+          "depth": 3,
+          "text": "Non-functional requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Map 101"
+        },
+        {
+          "depth": 3,
+          "text": "Back-of-the-envelope estimation"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "depth": 3,
+          "text": "Location service"
+        },
+        {
+          "depth": 3,
+          "text": "Navigation service"
+        },
+        {
+          "depth": 3,
+          "text": "Map rendering"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "Data model"
+        },
+        {
+          "depth": 3,
+          "text": "Services"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Wrap Up"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch18-google-maps/images/partitioning-system.png",
+          "alt": "partitioning-system",
+          "section": "Map 101"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/map-projections.png",
+          "alt": "map-projections",
+          "section": "Map 101"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/geohashing.png",
+          "alt": "geohashing",
+          "section": "Map 101"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/road-representation.png",
+          "alt": "road-representation",
+          "section": "Map 101"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/routing-tiles.png",
+          "alt": "routing-tiles",
+          "section": "Map 101"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/map-routing-hierarchical.png",
+          "alt": "map-routing-hierarchical",
+          "section": "Map 101"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/high-level-design.png",
+          "alt": "high-level-design",
+          "section": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/location-service.png",
+          "alt": "location-service",
+          "section": "Location service"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/location-update-batches.png",
+          "alt": "location-update-batches",
+          "section": "Location service"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/static-map-tiles.png",
+          "alt": "static-map-tiles",
+          "section": "Map rendering"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/cdn-vs-no-cdn.png",
+          "alt": "cdn-vs-no-cdn",
+          "section": "Map rendering"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/map-tile-url-calculation.png",
+          "alt": "map-tile-url-calculation",
+          "section": "Map rendering"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/user-location-data-torw.png",
+          "alt": "user-location-data-row",
+          "section": "Data model"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/precomputed-map-tile-image.png",
+          "alt": "precomputed-map-tile-image",
+          "section": "Data model"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/location-service-diagram.png",
+          "alt": "location-service-diagram",
+          "section": "Services"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/user-location-row-example.png",
+          "alt": "user-location-row-example",
+          "section": "Services"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/location-update-streaming.png",
+          "alt": "location-update-streaming",
+          "section": "Services"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/zoom-level-increases.png",
+          "alt": "zoom-level-increases",
+          "section": "Services"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/navigation-service.png",
+          "alt": "navigation-service",
+          "section": "Services"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/shortest-path-service.png",
+          "alt": "shortest-path-service",
+          "section": "Services"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/adaptive-eta-data-storage.png",
+          "alt": "adaptive-eta-data-storage",
+          "section": "Services"
+        },
+        {
+          "src": "/chapters/ch18-google-maps/images/final-design.png",
+          "alt": "final-design",
+          "section": "Step 4: Wrap Up"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 1987,
+      "readingMinutes": 10
+    },
+    {
+      "slug": "ch19-distributed-message-queue",
+      "number": 19,
+      "volume": 2,
+      "title": "Distributed Message Queue",
+      "summary": "We'll be designing a distributed message queue in this chapter.",
+      "concepts": [
+        "queues",
+        "replication",
+        "durability",
+        "stream-processing"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understand the Problem and Establish Design Scope"
+        },
+        {
+          "depth": 3,
+          "text": "Functional requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Non-functional requirements"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "depth": 3,
+          "text": "Messaging models"
+        },
+        {
+          "depth": 3,
+          "text": "Topics, partitions and brokers"
+        },
+        {
+          "depth": 3,
+          "text": "Consumer groups"
+        },
+        {
+          "depth": 3,
+          "text": "High-level architecture"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "Data storage"
+        },
+        {
+          "depth": 3,
+          "text": "Message data structure"
+        },
+        {
+          "depth": 3,
+          "text": "Batching"
+        },
+        {
+          "depth": 3,
+          "text": "Producer flow"
+        },
+        {
+          "depth": 3,
+          "text": "Consumer flow"
+        },
+        {
+          "depth": 3,
+          "text": "Consumer rebalancing"
+        },
+        {
+          "depth": 3,
+          "text": "State storage"
+        },
+        {
+          "depth": 3,
+          "text": "Metadata storage"
+        },
+        {
+          "depth": 3,
+          "text": "ZooKeeper"
+        },
+        {
+          "depth": 3,
+          "text": "Replication"
+        },
+        {
+          "depth": 3,
+          "text": "In-sync replicas"
+        },
+        {
+          "depth": 3,
+          "text": "Scalability"
+        },
+        {
+          "depth": 3,
+          "text": "Data delivery semantics"
+        },
+        {
+          "depth": 3,
+          "text": "Advanced features"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Wrap Up"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/message-queue-components.png",
+          "alt": "message-queue-components",
+          "section": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/point-to-point-model.png",
+          "alt": "point-to-point-model",
+          "section": "Messaging models"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/publish-subscribe-model.png",
+          "alt": "publish-subscribe-model",
+          "section": "Messaging models"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/partitions.png",
+          "alt": "partitions",
+          "section": "Topics, partitions and brokers"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/consumer-groups.png",
+          "alt": "consumer-groups",
+          "section": "Consumer groups"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/high-level-architecture.png",
+          "alt": "high-level-architecture",
+          "section": "High-level architecture"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/wal-example.png",
+          "alt": "wal-example",
+          "section": "Data storage"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/message-structure.png",
+          "alt": "message-structure",
+          "section": "Message data structure"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/routing-layer.png",
+          "alt": "routing-layer",
+          "section": "Producer flow"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/routing-layer-producer.png",
+          "alt": "routing-layer-producer",
+          "section": "Producer flow"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/batch-size-throughput-vs-latency.png",
+          "alt": "batch-size-throughput-vs-latency",
+          "section": "Producer flow"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/consumer-example.png",
+          "alt": "consumer-example",
+          "section": "Consumer flow"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/consumer-flow.png",
+          "alt": "consumer-flow",
+          "section": "Consumer flow"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/consumer-rebalancing.png",
+          "alt": "consumer-rebalancing",
+          "section": "Consumer rebalancing"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/consumer-rebalance-example.png",
+          "alt": "consumer-rebalance-example",
+          "section": "Consumer rebalancing"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/consumer-join-group-usecase.png",
+          "alt": "consumer-join-group-usecase",
+          "section": "Consumer rebalancing"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/consumer-leaves-group-usecase.png",
+          "alt": "consumer-leaves-group-usecase",
+          "section": "Consumer rebalancing"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/consumer-no-heartbeat-usecase.png",
+          "alt": "consumer-no-heartbeat-usecase",
+          "section": "Consumer rebalancing"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/state-storage.png",
+          "alt": "state-storage",
+          "section": "State storage"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/zookeeper.png",
+          "alt": "zookeeper",
+          "section": "ZooKeeper"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/replication-example.png",
+          "alt": "replication-example",
+          "section": "Replication"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/in-sync-replicas-example.png",
+          "alt": "in-sync-replicas-example",
+          "section": "In-sync replicas"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/ack-all.png",
+          "alt": "ack-all",
+          "section": "In-sync replicas"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/ack-1.png",
+          "alt": "ack-1",
+          "section": "In-sync replicas"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/ack-0.png",
+          "alt": "ack-0",
+          "section": "In-sync replicas"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/broker-failure-recovery.png",
+          "alt": "broker-failure-recovery",
+          "section": "Scalability"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/broker-replica-redistribution.png",
+          "alt": "broker-replica-redistribution",
+          "section": "Scalability"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/partition-exmaple.png",
+          "alt": "partition-example",
+          "section": "Scalability"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/partition-decrease.png",
+          "alt": "partition-decrease",
+          "section": "Scalability"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/at-most-once.png",
+          "alt": "at-most-once",
+          "section": "Data delivery semantics"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/at-least-once.png",
+          "alt": "at-least-once",
+          "section": "Data delivery semantics"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/exactly-once.png",
+          "alt": "exactly-once",
+          "section": "Data delivery semantics"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/message-filtering.png",
+          "alt": "message-filtering",
+          "section": "Advanced features"
+        },
+        {
+          "src": "/chapters/ch19-distributed-message-queue/images/delayed-message-implementation.png",
+          "alt": "delayed-message-implementation",
+          "section": "Advanced features"
+        }
+      ],
+      "unreferencedImages": [
+        "/chapters/ch19-distributed-message-queue/images/image_2023-02-10-10-00-53.png"
+      ],
+      "wordCount": 3775,
+      "readingMinutes": 18
+    },
+    {
+      "slug": "ch20-metrics-monitoring-and-alerting-system",
+      "number": 20,
+      "volume": 2,
+      "title": "Metrics Monitoring and Alerting System",
+      "summary": "This chapter focuses on designing a highly scalable metrics monitoring and alerting system, which is critical for ensuring high availability and reliability.",
+      "concepts": [
+        "observability",
+        "stream-processing",
+        "databases",
+        "reliability"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understand the Problem and Establish Design Scope"
+        },
+        {
+          "depth": 3,
+          "text": "High-level requirements and assumptions"
+        },
+        {
+          "depth": 3,
+          "text": "Non-functional requirements"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "depth": 3,
+          "text": "Fundamentals"
+        },
+        {
+          "depth": 3,
+          "text": "Data model"
+        },
+        {
+          "depth": 3,
+          "text": "High-level Design"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "Metrics collection"
+        },
+        {
+          "depth": 3,
+          "text": "Scale the metrics transmission pipeline"
+        },
+        {
+          "depth": 3,
+          "text": "Where aggregations can happen"
+        },
+        {
+          "depth": 3,
+          "text": "Query Service"
+        },
+        {
+          "depth": 3,
+          "text": "Storage layer"
+        },
+        {
+          "depth": 3,
+          "text": "Alerting system"
+        },
+        {
+          "depth": 3,
+          "text": "Visualization system"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Wrap up"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/metrics-monitoring-core-components.png",
+          "alt": "metrics-monitoring-core-components",
+          "section": "Fundamentals"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/metrics-example-1.png",
+          "alt": "metrics-example-1",
+          "section": "Data model"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/metrics-example-1-data.png",
+          "alt": "metrics-example-1-data",
+          "section": "Data model"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/time-series-data-example.png",
+          "alt": "time-series-data-example",
+          "section": "Data model"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/time-series-data-viz.png",
+          "alt": "time-series-data-viz",
+          "section": "Data model"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/influxdb-scale.png",
+          "alt": "influxdb-scale",
+          "section": "Data model"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/high-level-design.png",
+          "alt": "high-level-design",
+          "section": "High-level Design"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/metrics-collection.png",
+          "alt": "metrics-collection",
+          "section": "Metrics collection"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/pull-model-example.png",
+          "alt": "pull-model-example",
+          "section": "Metrics collection"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/service-discovery-example.png",
+          "alt": "service-discovery-example",
+          "section": "Metrics collection"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/metrics-collection-flow.png",
+          "alt": "metrics-collection-flow",
+          "section": "Metrics collection"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/consistent-hash-ring.png",
+          "alt": "consistent-hash-ring",
+          "section": "Metrics collection"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/push-model-example.png",
+          "alt": "push-model-example",
+          "section": "Metrics collection"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/metrics-collector-agent.png",
+          "alt": "metrics-collector-agent",
+          "section": "Metrics collection"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/metrics-transmission-pipeline.png",
+          "alt": "metrics-transmission-pipeline",
+          "section": "Scale the metrics transmission pipeline"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/queuing-mechanism.png",
+          "alt": "queuing-mechanism",
+          "section": "Scale the metrics transmission pipeline"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/metrics-collection-kafka.png",
+          "alt": "metrics-collection-kafka",
+          "section": "Scale the metrics transmission pipeline"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/cache-layer-query-service.png",
+          "alt": "cache-layer-query-service",
+          "section": "Query Service"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/double-delta-encoding.png",
+          "alt": "double-delta-encoding",
+          "section": "Storage layer"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/alerting-system.png",
+          "alt": "alerting-system",
+          "section": "Alerting system"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/grafana-dashboard.png",
+          "alt": "grafana-dashboard",
+          "section": "Visualization system"
+        },
+        {
+          "src": "/chapters/ch20-metrics-monitoring-and-alerting-system/images/final-design.png",
+          "alt": "final-design",
+          "section": "Step 4: Wrap up"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 2745,
+      "readingMinutes": 13
+    },
+    {
+      "slug": "ch21-ad-click-event-aggregation",
+      "number": 21,
+      "volume": 2,
+      "title": "Ad Click Event Aggregation",
+      "summary": "Digital advertising is a big industry with the rise of Facebook, YouTube, TikTok, etc.",
+      "concepts": [
+        "stream-processing",
+        "queues",
+        "reliability",
+        "consistency"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understand the Problem and Establish Design Scope"
+        },
+        {
+          "depth": 3,
+          "text": "Functional requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Non-functional requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Back-of-the-envelope estimation"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "depth": 3,
+          "text": "Query API Design"
+        },
+        {
+          "depth": 3,
+          "text": "Data model"
+        },
+        {
+          "depth": 3,
+          "text": "High-level design"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "Streaming vs. Batching"
+        },
+        {
+          "depth": 3,
+          "text": "Time"
+        },
+        {
+          "depth": 3,
+          "text": "Aggregation window"
+        },
+        {
+          "depth": 3,
+          "text": "Delivery guarantees"
+        },
+        {
+          "depth": 3,
+          "text": "Data deduplication"
+        },
+        {
+          "depth": 3,
+          "text": "Scale the system"
+        },
+        {
+          "depth": 3,
+          "text": "Fault Tolerance"
+        },
+        {
+          "depth": 3,
+          "text": "Data monitoring and correctness"
+        },
+        {
+          "depth": 3,
+          "text": "Alternative design"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Wrap up"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/digital-advertising-example.png",
+          "alt": "digital-advertising-example",
+          "section": "Introduction"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/high-level-design-1.png",
+          "alt": "high-level-design-1",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/high-level-design-2.png",
+          "alt": "high-level-design-2",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/atomic-commit.png",
+          "alt": "atomic-commit",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/ad-count-map-reduce.png",
+          "alt": "ad-count-map-reduce",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/top-100-map-reduce.png",
+          "alt": "top-100-map-reduce",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/map-node.png",
+          "alt": "map-node",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/reduce-node.png",
+          "alt": "reduce-node",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/use-case-1.png",
+          "alt": "use-case-1",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/use-case-2.png",
+          "alt": "use-case-2",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/lambda-architecture.png",
+          "alt": "lambda-architecture",
+          "section": "Streaming vs. Batching"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/kappa-architecture.png",
+          "alt": "kappa-architecture",
+          "section": "Streaming vs. Batching"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/recalculation-example.png",
+          "alt": "recalculation-example",
+          "section": "Streaming vs. Batching"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/watermark-technique.png",
+          "alt": "watermark-technique",
+          "section": "Time"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/watermark-2.png",
+          "alt": "watermark-2",
+          "section": "Time"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/tumbling-window.png",
+          "alt": "tumbling-window",
+          "section": "Aggregation window"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/sliding-window.png",
+          "alt": "sliding-window",
+          "section": "Aggregation window"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/data-duplication-example.png",
+          "alt": "data-duplication-example",
+          "section": "Data deduplication"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/data-duplication-example-2.png",
+          "alt": "data-duplication-example-2",
+          "section": "Data deduplication"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/data-duplication-example-3.png",
+          "alt": "data-duplication-example-3",
+          "section": "Data deduplication"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/scale-consumers.png",
+          "alt": "scale-consumers",
+          "section": "Scale the system"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/aggregation-service-scaling.png",
+          "alt": "aggregation-service-scaling",
+          "section": "Scale the system"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/multi-threading-example.png",
+          "alt": "multi-threading-example",
+          "section": "Scale the system"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/cassandra-scalability.png",
+          "alt": "cassandra-scalability",
+          "section": "Scale the system"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/hotspot-issue.png",
+          "alt": "hotspot-issue",
+          "section": "Scale the system"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/fault-tolerance-example.png",
+          "alt": "fault-tolerance-example",
+          "section": "Fault Tolerance"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/fault-tolerance-recovery-example.png",
+          "alt": "fault-tolerance-recovery-example",
+          "section": "Fault Tolerance"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/reconciliation-flow.png",
+          "alt": "reconciliation-flow",
+          "section": "Data monitoring and correctness"
+        },
+        {
+          "src": "/chapters/ch21-ad-click-event-aggregation/images/alternative-design.png",
+          "alt": "alternative-design",
+          "section": "Alternative design"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 3452,
+      "readingMinutes": 16
+    },
+    {
+      "slug": "ch22-hotel-reservation-system",
+      "number": 22,
+      "volume": 2,
+      "title": "Hotel Reservation System",
+      "summary": "In this chapter, we're designing a hotel reservation system, similar to Marriott International.",
+      "concepts": [
+        "databases",
+        "concurrency",
+        "caching",
+        "sharding"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understand the Problem and Establish Design Scope"
+        },
+        {
+          "depth": 3,
+          "text": "Non-functional requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Back-of-the-envelope estimation"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "depth": 3,
+          "text": "API Design"
+        },
+        {
+          "depth": 3,
+          "text": "Data model"
+        },
+        {
+          "depth": 3,
+          "text": "High-level Design"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "Improved data model"
+        },
+        {
+          "depth": 3,
+          "text": "Concurrency issues"
+        },
+        {
+          "depth": 3,
+          "text": "Scalability"
+        },
+        {
+          "depth": 3,
+          "text": "Data consistency among services"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Wrap Up"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/qps-estimation.png",
+          "alt": "qps-estimation",
+          "section": "Back-of-the-envelope estimation"
+        },
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/schema-design.png",
+          "alt": "schema-design",
+          "section": "Data model"
+        },
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/status-state-machine.png",
+          "alt": "status-state-machine",
+          "section": "Data model"
+        },
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/high-level-design.png",
+          "alt": "high-level-design",
+          "section": "High-level Design"
+        },
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/updated-schema.png",
+          "alt": "updated-schema",
+          "section": "Improved data model"
+        },
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/double-booking-single-user.png",
+          "alt": "double-booking-single-user",
+          "section": "Concurrency issues"
+        },
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/idempotency.png",
+          "alt": "idempotency",
+          "section": "Concurrency issues"
+        },
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/unique-constraint-violation.png",
+          "alt": "unique-constraint-violation",
+          "section": "Concurrency issues"
+        },
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/double-booking-multiple-users.png",
+          "alt": "double-booking-multiple-users",
+          "section": "Concurrency issues"
+        },
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/pessimistic-locking.png",
+          "alt": "pessimistic-locking",
+          "section": "Concurrency issues"
+        },
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/optimistic-locking.png",
+          "alt": "optimistic-locking",
+          "section": "Concurrency issues"
+        },
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/database-constraint.png",
+          "alt": "database-constraint",
+          "section": "Concurrency issues"
+        },
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/database-sharding.png",
+          "alt": "database-sharding",
+          "section": "Scalability"
+        },
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/inventory-cache.png",
+          "alt": "inventory-cache",
+          "section": "Scalability"
+        },
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/microservices-vs-monolith.png",
+          "alt": "microservices-vs-monolith",
+          "section": "Data consistency among services"
+        },
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/atomicity-monolith.png",
+          "alt": "atomicity-monolith",
+          "section": "Data consistency among services"
+        },
+        {
+          "src": "/chapters/ch22-hotel-reservation-system/images/microservice-non-atomic-operation.png",
+          "alt": "microservice-non-atomic-operation",
+          "section": "Data consistency among services"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 2934,
+      "readingMinutes": 14
+    },
+    {
+      "slug": "ch23-distributed-email-service",
+      "number": 23,
+      "volume": 2,
+      "title": "Distributed Email Service",
+      "summary": "We'll design a distributed email service, similar to Gmail in this chapter.",
+      "concepts": [
+        "databases",
+        "queues",
+        "reliability",
+        "scalability"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understand the Problem and Establish Design Scope"
+        },
+        {
+          "depth": 3,
+          "text": "Non-functional requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Back-of-the-envelope estimation"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "depth": 3,
+          "text": "Email knowledge 101"
+        },
+        {
+          "depth": 3,
+          "text": "Traditional mail servers"
+        },
+        {
+          "depth": 3,
+          "text": "Distributed mail servers"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "Metadata database"
+        },
+        {
+          "depth": 3,
+          "text": "Email deliverability"
+        },
+        {
+          "depth": 3,
+          "text": "Search"
+        },
+        {
+          "depth": 3,
+          "text": "Scalability and availability"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Wrap Up"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch23-distributed-email-service/images/dns-lookup.png",
+          "alt": "dns-lookup",
+          "section": "Email knowledge 101"
+        },
+        {
+          "src": "/chapters/ch23-distributed-email-service/images/traditional-mail-server.png",
+          "alt": "traditional-mail-server",
+          "section": "Traditional mail servers"
+        },
+        {
+          "src": "/chapters/ch23-distributed-email-service/images/local-dir-storage.png",
+          "alt": "local-dir-storage",
+          "section": "Traditional mail servers"
+        },
+        {
+          "src": "/chapters/ch23-distributed-email-service/images/high-level-architecture.png",
+          "alt": "high-level-architecture",
+          "section": "Distributed mail servers"
+        },
+        {
+          "src": "/chapters/ch23-distributed-email-service/images/email-sending-flow.png",
+          "alt": "email-sending-flow",
+          "section": "Distributed mail servers"
+        },
+        {
+          "src": "/chapters/ch23-distributed-email-service/images/email-receiving-flkow.png",
+          "alt": "email-receiving-flow",
+          "section": "Distributed mail servers"
+        },
+        {
+          "src": "/chapters/ch23-distributed-email-service/images/legend.png",
+          "alt": "legend",
+          "section": "Metadata database"
+        },
+        {
+          "src": "/chapters/ch23-distributed-email-service/images/folders-table.png",
+          "alt": "folders-table",
+          "section": "Metadata database"
+        },
+        {
+          "src": "/chapters/ch23-distributed-email-service/images/emails-table.png",
+          "alt": "emails-table",
+          "section": "Metadata database"
+        },
+        {
+          "src": "/chapters/ch23-distributed-email-service/images/attachments.png",
+          "alt": "attachments",
+          "section": "Metadata database"
+        },
+        {
+          "src": "/chapters/ch23-distributed-email-service/images/read-unread-emails.png",
+          "alt": "read-unread-emails",
+          "section": "Metadata database"
+        },
+        {
+          "src": "/chapters/ch23-distributed-email-service/images/elasticsearch.png",
+          "alt": "elasticsearch",
+          "section": "Search"
+        },
+        {
+          "src": "/chapters/ch23-distributed-email-service/images/lsm-tree.png",
+          "alt": "lsm-tree",
+          "section": "Search"
+        },
+        {
+          "src": "/chapters/ch23-distributed-email-service/images/multi-dc-example.png",
+          "alt": "multi-dc-example",
+          "section": "Scalability and availability"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 2040,
+      "readingMinutes": 10
+    },
+    {
+      "slug": "ch24-s3-like-object-storage",
+      "number": 24,
+      "volume": 2,
+      "title": "S3-like Object Storage",
+      "summary": "In this chapter, we'll be designing an object storage service, similar to Amazon S3.",
+      "concepts": [
+        "durability",
+        "sharding",
+        "consistency",
+        "databases"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understand the Problem and Establish Design Scope"
+        },
+        {
+          "depth": 3,
+          "text": "Non-functional requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Back-of-the-envelope estimation"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "depth": 3,
+          "text": "High-level design"
+        },
+        {
+          "depth": 3,
+          "text": "Uploading an object"
+        },
+        {
+          "depth": 3,
+          "text": "Downloading an object"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "Data store"
+        },
+        {
+          "depth": 3,
+          "text": "Metadata data model"
+        },
+        {
+          "depth": 3,
+          "text": "Listing objects in a bucket"
+        },
+        {
+          "depth": 3,
+          "text": "Object versioning"
+        },
+        {
+          "depth": 3,
+          "text": "Optimizing uploads of large files"
+        },
+        {
+          "depth": 3,
+          "text": "Garbage collection"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Wrap Up"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/storage-comparison.png",
+          "alt": "storage-comparison",
+          "section": "Introduction"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/object-store-vs-unix.png",
+          "alt": "object-store-vs-unix",
+          "section": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/bucket-and-object.png",
+          "alt": "bucket-and-object",
+          "section": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/high-level-design.png",
+          "alt": "high-level-design",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/uploading-object.png",
+          "alt": "uploading-object",
+          "section": "Uploading an object"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/download-object.png",
+          "alt": "download-object",
+          "section": "Downloading an object"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/data-store-interactions.png",
+          "alt": "data-store-interactions",
+          "section": "Data store"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/data-store-main-components.png",
+          "alt": "data-store-main-components",
+          "section": "Data store"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/virtual-cluster-map.png",
+          "alt": "virtual-cluster-map",
+          "section": "Data store"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/data-persistence-flow.png",
+          "alt": "data-persistence-flow",
+          "section": "Data store"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/consistency-vs-latency.png",
+          "alt": "consistency-vs-latency",
+          "section": "Data store"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/wal-optimization.png",
+          "alt": "wal-optimization",
+          "section": "Data store"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/updated-data-persistence-flow.png",
+          "alt": "updated-data-persistence-flow",
+          "section": "Data store"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/failure-domain-isolation.png",
+          "alt": "failure-domain-isolation",
+          "section": "Data store"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/erasure-coding.png",
+          "alt": "erasure-coding",
+          "section": "Data store"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/erasure-coding-across-failure-domains.png",
+          "alt": "erasure-coding-across-failure-domains",
+          "section": "Data store"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/erasure-coding-vs-replication.png",
+          "alt": "erasure-coding-vs-replication",
+          "section": "Data store"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/checksums-for-correctness.png",
+          "alt": "checksums-for-correctness",
+          "section": "Data store"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/metadata-data-model.png",
+          "alt": "metadata-data-model",
+          "section": "Metadata data model"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/object-versioning.png",
+          "alt": "object-versioning",
+          "section": "Object versioning"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/deleting-versioned-object.png",
+          "alt": "deleting-versioned-object",
+          "section": "Object versioning"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/multipart-upload.png",
+          "alt": "multipart-upload",
+          "section": "Optimizing uploads of large files"
+        },
+        {
+          "src": "/chapters/ch24-s3-like-object-storage/images/compaction.png",
+          "alt": "compaction",
+          "section": "Garbage collection"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 2760,
+      "readingMinutes": 13
+    },
+    {
+      "slug": "ch25-real-time-gaming-leaderboard",
+      "number": 25,
+      "volume": 2,
+      "title": "Real-time Gaming Leaderboard",
+      "summary": "We are going to design a leaderboard for an online mobile game:",
+      "concepts": [
+        "databases",
+        "caching",
+        "sharding",
+        "scalability"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understand the Problem and Establish Design Scope"
+        },
+        {
+          "depth": 3,
+          "text": "Functional requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Non-functional requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Back-of-the-envelope estimation"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "depth": 3,
+          "text": "API Design"
+        },
+        {
+          "depth": 3,
+          "text": "High-level architecture"
+        },
+        {
+          "depth": 3,
+          "text": "Data models"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "To use a cloud provider or not"
+        },
+        {
+          "depth": 3,
+          "text": "Scaling Redis"
+        },
+        {
+          "depth": 3,
+          "text": "Alternative solution: NoSQL"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Wrap Up"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/leaderboard.png",
+          "alt": "leaderboard",
+          "section": "Introduction"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/high-level-architecture.png",
+          "alt": "high-level-architecture",
+          "section": "High-level architecture"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/alternative-design.png",
+          "alt": "alternative-design",
+          "section": "High-level architecture"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/message-queue-based-comm.png",
+          "alt": "message-queue-based-comm",
+          "section": "High-level architecture"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/leaderboard-table.png",
+          "alt": "leaderboard-table",
+          "section": "Data models"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/user-wins-point.png",
+          "alt": "user-wins-point",
+          "section": "Data models"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/find-leaderboard-position.png",
+          "alt": "find-leaderboard-position",
+          "section": "Data models"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/sorted-set.png",
+          "alt": "sorted-set",
+          "section": "Data models"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/skip-list.png",
+          "alt": "skip-list",
+          "section": "Data models"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/skip-list-performance.png",
+          "alt": "skip-list-performance",
+          "section": "Data models"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/leaderboard-position-of-user.png",
+          "alt": "leaderboard-position-of-user",
+          "section": "Data models"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/manage-services-ourselves.png",
+          "alt": "manage-services-ourselves",
+          "section": "To use a cloud provider or not"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/api-gateway-mapping.png",
+          "alt": "api-gateway-mapping",
+          "section": "To use a cloud provider or not"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/user-scoring-point-lambda.png",
+          "alt": "user-scoring-point-lambda",
+          "section": "To use a cloud provider or not"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/user-retrieve-leaderboard.png",
+          "alt": "user-retrieve-leaderboard",
+          "section": "To use a cloud provider or not"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/range-partition.png",
+          "alt": "range-partition",
+          "section": "Scaling Redis"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/hash-partition.png",
+          "alt": "hash-partition",
+          "section": "Scaling Redis"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/top-10-players-calculation.png",
+          "alt": "top-10-players-calculation",
+          "section": "Scaling Redis"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/dynamo-db.png",
+          "alt": "dynamo-db",
+          "section": "Alternative solution: NoSQL"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/chess-game-leaderboard-table-1.png",
+          "alt": "chess-game-leaderboard-table-1",
+          "section": "Alternative solution: NoSQL"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/chess-game-leaderboard-table-2.png",
+          "alt": "chess-game-leaderboard-table-2",
+          "section": "Alternative solution: NoSQL"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/chess-game-leaderboard-table-3.png",
+          "alt": "chess-game-leaderboard-table-3",
+          "section": "Alternative solution: NoSQL"
+        },
+        {
+          "src": "/chapters/ch25-real-time-gaming-leaderboard/images/scatter-gather-2.png",
+          "alt": "scatter-gather-2",
+          "section": "Alternative solution: NoSQL"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 2274,
+      "readingMinutes": 11
+    },
+    {
+      "slug": "ch26-payment-system",
+      "number": 26,
+      "volume": 2,
+      "title": "Payment System",
+      "summary": "We'll design a payment system in this chapter, which underpins all of modern e-commerce.",
+      "concepts": [
+        "reliability",
+        "concurrency",
+        "queues",
+        "consistency"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understand the Problem and Establish Design Scope"
+        },
+        {
+          "depth": 3,
+          "text": "Functional requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Non-functional requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Back-of-the-envelope estimation"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "depth": 3,
+          "text": "Pay-in flow"
+        },
+        {
+          "depth": 3,
+          "text": "APIs for payment service"
+        },
+        {
+          "depth": 3,
+          "text": "Payment service data model"
+        },
+        {
+          "depth": 3,
+          "text": "Double-entry ledger system"
+        },
+        {
+          "depth": 3,
+          "text": "Hosted payment page"
+        },
+        {
+          "depth": 3,
+          "text": "Pay-out flow"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "PSP Integration"
+        },
+        {
+          "depth": 3,
+          "text": "Reconciliation"
+        },
+        {
+          "depth": 3,
+          "text": "Handling payment processing delays"
+        },
+        {
+          "depth": 3,
+          "text": "Communication among internal services"
+        },
+        {
+          "depth": 3,
+          "text": "Handling failed payments"
+        },
+        {
+          "depth": 3,
+          "text": "Exactly-once delivery"
+        },
+        {
+          "depth": 3,
+          "text": "Consistency"
+        },
+        {
+          "depth": 3,
+          "text": "Payment security"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Wrap Up"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch26-payment-system/images/high-level-flow.png",
+          "alt": "high-level-flow",
+          "section": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "src": "/chapters/ch26-payment-system/images/payin-flow-high-level.png",
+          "alt": "pay-in-flow-high-level",
+          "section": "Pay-in flow"
+        },
+        {
+          "src": "/chapters/ch26-payment-system/images/hosted-payment-page.png",
+          "alt": "hosted-payment-page",
+          "section": "Hosted payment page"
+        },
+        {
+          "src": "/chapters/ch26-payment-system/images/hosted-payment-page-workflow.png",
+          "alt": "hosted-payment-page-workflow",
+          "section": "PSP Integration"
+        },
+        {
+          "src": "/chapters/ch26-payment-system/images/settlement-report.png",
+          "alt": "settlement-report",
+          "section": "Reconciliation"
+        },
+        {
+          "src": "/chapters/ch26-payment-system/images/single-receiver.png",
+          "alt": "single-receiver",
+          "section": "Communication among internal services"
+        },
+        {
+          "src": "/chapters/ch26-payment-system/images/multiple-receiver.png",
+          "alt": "multiple-receiver",
+          "section": "Communication among internal services"
+        },
+        {
+          "src": "/chapters/ch26-payment-system/images/failed-payments.png",
+          "alt": "failed-payments",
+          "section": "Handling failed payments"
+        },
+        {
+          "src": "/chapters/ch26-payment-system/images/retry-mechanism.png",
+          "alt": "retry-mechanism",
+          "section": "Exactly-once delivery"
+        },
+        {
+          "src": "/chapters/ch26-payment-system/images/idempotency-example.png",
+          "alt": "idempotency-example",
+          "section": "Exactly-once delivery"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 2371,
+      "readingMinutes": 11
+    },
+    {
+      "slug": "ch27-digital-wallet",
+      "number": 27,
+      "volume": 2,
+      "title": "Digital Wallet",
+      "summary": "Payment platforms usually have a wallet service, where they allow clients to store funds within the application, which they can withdraw later.",
+      "concepts": [
+        "concurrency",
+        "consistency",
+        "databases",
+        "reliability"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understand the Problem and Establish Design Scope"
+        },
+        {
+          "depth": 3,
+          "text": "Back-of-the-envelope estimation"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "depth": 3,
+          "text": "API Design"
+        },
+        {
+          "depth": 3,
+          "text": "In-memory sharding solution"
+        },
+        {
+          "depth": 3,
+          "text": "Distributed transactions"
+        },
+        {
+          "depth": 3,
+          "text": "Distributed transaction using Try-Confirm/Cancel (TC/C)"
+        },
+        {
+          "depth": 3,
+          "text": "TC/C Failure modes"
+        },
+        {
+          "depth": 3,
+          "text": "Distributed transaction using Saga"
+        },
+        {
+          "depth": 3,
+          "text": "Event sourcing"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "High-performance event sourcing"
+        },
+        {
+          "depth": 3,
+          "text": "Reliable high-performance event sourcing"
+        },
+        {
+          "depth": 3,
+          "text": "Distributed event sourcing"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Wrap Up"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch27-digital-wallet/images/digital-wallet.png",
+          "alt": "digital-wallet",
+          "section": "Introduction"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/wallet-service.png",
+          "alt": "wallet-service",
+          "section": "In-memory sharding solution"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/distributed-transactions-relational-dbs.png",
+          "alt": "distributed-transactions-relational-dbs",
+          "section": "Distributed transactions"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/2pc-protocol.png",
+          "alt": "2pc-protocol",
+          "section": "Distributed transactions"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/try-phase.png",
+          "alt": "try-phase",
+          "section": "Distributed transaction using Try-Confirm/Cancel (TC/C)"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/confirm-phase.png",
+          "alt": "confirm-phase",
+          "section": "Distributed transaction using Try-Confirm/Cancel (TC/C)"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/cancel-phase.png",
+          "alt": "cancel-phase",
+          "section": "Distributed transaction using Try-Confirm/Cancel (TC/C)"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/phase-status-tables.png",
+          "alt": "phase-status-tables",
+          "section": "TC/C Failure modes"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/unbalanced-state.png",
+          "alt": "unbalanced-state",
+          "section": "TC/C Failure modes"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/out-of-order-execution.png",
+          "alt": "out-of-order-execution",
+          "section": "TC/C Failure modes"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/saga.png",
+          "alt": "saga",
+          "section": "Distributed transaction using Saga"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/event-sourcing.png",
+          "alt": "event-sourcing",
+          "section": "Event sourcing"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/dynamic-event-sourcing.png",
+          "alt": "dynamic-event-sourcing",
+          "section": "Event sourcing"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/command-queue.png",
+          "alt": "command-queue",
+          "section": "Event sourcing"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/wallet-service-state-macghine.png",
+          "alt": "wallet-service-state-machine",
+          "section": "Event sourcing"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/historical-states.png",
+          "alt": "historical-states",
+          "section": "Event sourcing"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/cqrs-architecture.png",
+          "alt": "cqrs-architecture",
+          "section": "Event sourcing"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/mmap-optimization.png",
+          "alt": "mmap-optimization",
+          "section": "High-performance event sourcing"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/rocks-db-approach.png",
+          "alt": "rocks-db-approach",
+          "section": "High-performance event sourcing"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/snapshot-approach.png",
+          "alt": "snapshot-approach",
+          "section": "High-performance event sourcing"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/raft-replication.png",
+          "alt": "raft-replication",
+          "section": "Reliable high-performance event sourcing"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/polling-approach.png",
+          "alt": "polling-approach",
+          "section": "Distributed event sourcing"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/reverse-proxy.png",
+          "alt": "reverse-proxy",
+          "section": "Distributed event sourcing"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/push-state-machines.png",
+          "alt": "push-state-machines",
+          "section": "Distributed event sourcing"
+        },
+        {
+          "src": "/chapters/ch27-digital-wallet/images/sharded-raft-groups.png",
+          "alt": "sharded-raft-groups",
+          "section": "Distributed event sourcing"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 2904,
+      "readingMinutes": 14
+    },
+    {
+      "slug": "ch28-stock-exchange",
+      "number": 28,
+      "volume": 2,
+      "title": "Stock Exchange",
+      "summary": "We'll design an electronic stock exchange in this chapter.",
+      "concepts": [
+        "concurrency",
+        "reliability",
+        "stream-processing",
+        "databases"
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Introduction"
+        },
+        {
+          "depth": 2,
+          "text": "Step 1: Understand the Problem and Establish Design scope"
+        },
+        {
+          "depth": 3,
+          "text": "Non-functional requirements"
+        },
+        {
+          "depth": 3,
+          "text": "Back-of-the-envelope estimation"
+        },
+        {
+          "depth": 2,
+          "text": "Step 2: Propose High-Level Design and Get Buy-In"
+        },
+        {
+          "depth": 3,
+          "text": "Business Knowledge 101"
+        },
+        {
+          "depth": 3,
+          "text": "High-level design"
+        },
+        {
+          "depth": 3,
+          "text": "API Design"
+        },
+        {
+          "depth": 3,
+          "text": "Data models"
+        },
+        {
+          "depth": 2,
+          "text": "Step 3: Design Deep Dive"
+        },
+        {
+          "depth": 3,
+          "text": "Performance"
+        },
+        {
+          "depth": 3,
+          "text": "Event sourcing"
+        },
+        {
+          "depth": 3,
+          "text": "High availability"
+        },
+        {
+          "depth": 3,
+          "text": "Fault tolerance"
+        },
+        {
+          "depth": 3,
+          "text": "Matching algorithms"
+        },
+        {
+          "depth": 3,
+          "text": "Determinism"
+        },
+        {
+          "depth": 3,
+          "text": "Market data publisher optimizations"
+        },
+        {
+          "depth": 3,
+          "text": "Distribution fairness of market data and multicast"
+        },
+        {
+          "depth": 3,
+          "text": "Colocation"
+        },
+        {
+          "depth": 3,
+          "text": "Network Security"
+        },
+        {
+          "depth": 2,
+          "text": "Step 4: Wrap Up"
+        }
+      ],
+      "figures": [
+        {
+          "src": "/chapters/ch28-stock-exchange/images/world-stock-exchanges.png",
+          "alt": "world-stock-exchanges",
+          "section": "Introduction"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/l1-price.png",
+          "alt": "l1-price",
+          "section": "Business Knowledge 101"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/l2-price.png",
+          "alt": "l2-price",
+          "section": "Business Knowledge 101"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/l3-price.png",
+          "alt": "l3-price",
+          "section": "Business Knowledge 101"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/candlestick.png",
+          "alt": "candlestick",
+          "section": "Business Knowledge 101"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/high-level-design.png",
+          "alt": "high-level-design",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/sequencer.png",
+          "alt": "sequencer",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/client-gateway.png",
+          "alt": "client-gateway",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/client-gateways.png",
+          "alt": "client-gateways",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/market-data.png",
+          "alt": "market-data",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/reporting-flow.png",
+          "alt": "reporting-flow",
+          "section": "High-level design"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/product-order-execution-data-model.png",
+          "alt": "product-order-execution-data-model",
+          "section": "Data models"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/order-book-execution.png",
+          "alt": "order-book-execution",
+          "section": "Data models"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/order-book-impl.png",
+          "alt": "order-book-impl",
+          "section": "Data models"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/mmap-bus.png",
+          "alt": "mmap-bus",
+          "section": "Performance"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/application-loop.png",
+          "alt": "application-loop",
+          "section": "Performance"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/event-sourcing.png",
+          "alt": "event-sourcing",
+          "section": "Event sourcing"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/design-so-far.png",
+          "alt": "design-so-far",
+          "section": "Event sourcing"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/sequencer-deep-dive.png",
+          "alt": "sequencer-deep-dive",
+          "section": "Event sourcing"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/leader-election.png",
+          "alt": "leader-election",
+          "section": "High availability"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/replication-across-servers.png",
+          "alt": "replication-across-servers",
+          "section": "Fault tolerance"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/leader-election-terms.png",
+          "alt": "leader-election-terms",
+          "section": "Fault tolerance"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/determinism.png",
+          "alt": "determinism",
+          "section": "Determinism"
+        },
+        {
+          "src": "/chapters/ch28-stock-exchange/images/market-data-publisher.png",
+          "alt": "market-data-publisher",
+          "section": "Market data publisher optimizations"
+        }
+      ],
+      "unreferencedImages": [],
+      "wordCount": 3235,
+      "readingMinutes": 15
+    }
+  ]
+}

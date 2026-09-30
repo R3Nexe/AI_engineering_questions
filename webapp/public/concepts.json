@@ -1,0 +1,200 @@
+{
+  "concepts": [
+    {
+      "id": "fundamentals",
+      "name": "System Fundamentals",
+      "parentId": null,
+      "summary": "Core building blocks of distributed systems, including performance metrics, scalability patterns, and foundational infrastructure components.",
+      "order": 1
+    },
+    {
+      "id": "data",
+      "name": "Data & Storage",
+      "parentId": null,
+      "summary": "Databases, replication, sharding, consistency models, durability, and concurrency control strategies for managing data at scale.",
+      "order": 2
+    },
+    {
+      "id": "async",
+      "name": "Async & Reliability",
+      "parentId": null,
+      "summary": "Message queues, stream processing, reliability engineering, and observability primitives for building resilient distributed systems.",
+      "order": 3
+    },
+    {
+      "id": "ai-systems",
+      "name": "AI Systems",
+      "parentId": null,
+      "summary": "Machine learning infrastructure covering embeddings, retrieval, LLM inference, agentic systems, and model evaluation.",
+      "order": 4
+    },
+    {
+      "id": "latency-metrics",
+      "name": "Latency & Metrics",
+      "parentId": "fundamentals",
+      "summary": "Percentile latency (p50/p95/p99), SLOs, SLAs, and the techniques used to measure and reduce tail latency in distributed services.",
+      "order": 1
+    },
+    {
+      "id": "scalability",
+      "name": "Scalability",
+      "parentId": "fundamentals",
+      "summary": "Horizontal vs. vertical scaling, stateless design, auto-scaling policies, and the capacity-planning approaches that let systems handle growing load.",
+      "order": 2
+    },
+    {
+      "id": "load-balancing",
+      "name": "Load Balancing",
+      "parentId": "fundamentals",
+      "summary": "Round-robin, least-connections, consistent hashing, and health-check strategies that distribute traffic across server fleets without hot spots.",
+      "order": 3
+    },
+    {
+      "id": "caching",
+      "name": "Caching",
+      "parentId": "fundamentals",
+      "summary": "In-process, distributed (Redis/Memcached), and CDN caching layers; eviction policies (LRU, LFU), cache stampede prevention, and write-through vs. write-behind patterns.",
+      "order": 4
+    },
+    {
+      "id": "cdn",
+      "name": "CDN",
+      "parentId": "fundamentals",
+      "summary": "Content delivery networks that serve static and dynamic assets from edge PoPs, reducing origin load and cutting cross-region latency for end users.",
+      "order": 5
+    },
+    {
+      "id": "api-design",
+      "name": "API Design",
+      "parentId": "fundamentals",
+      "summary": "REST, GraphQL, and gRPC API design principles including versioning, idempotency, pagination, and error-handling conventions for public-facing services.",
+      "order": 6
+    },
+    {
+      "id": "rate-limiting",
+      "name": "Rate Limiting",
+      "parentId": "fundamentals",
+      "summary": "Token bucket, leaky bucket, sliding window, and fixed window algorithms that enforce per-client quotas to protect services from abuse and overload.",
+      "order": 7
+    },
+    {
+      "id": "databases",
+      "name": "Databases",
+      "parentId": "data",
+      "summary": "Relational (PostgreSQL, MySQL) and NoSQL (DynamoDB, Cassandra, MongoDB) database fundamentals, indexing strategies, and query optimisation.",
+      "order": 1
+    },
+    {
+      "id": "replication",
+      "name": "Replication",
+      "parentId": "data",
+      "summary": "Leader-follower and multi-leader replication, replication lag, read replicas, and failover mechanisms that keep data available when nodes fail.",
+      "order": 2
+    },
+    {
+      "id": "sharding",
+      "name": "Sharding",
+      "parentId": "data",
+      "summary": "Horizontal data partitioning by key range, hash, or directory; consistent hashing rings; and re-sharding strategies for growing data sets.",
+      "order": 3
+    },
+    {
+      "id": "consistency",
+      "name": "Consistency",
+      "parentId": "data",
+      "summary": "CAP theorem, eventual vs. strong vs. causal consistency, linearisability, and the practical trade-offs between read freshness and availability.",
+      "order": 4
+    },
+    {
+      "id": "durability",
+      "name": "Durability",
+      "parentId": "data",
+      "summary": "Write-ahead logging (WAL), checkpointing, RAID, cross-region backups, and RPO/RTO targets that determine how much data loss a system can tolerate.",
+      "order": 5
+    },
+    {
+      "id": "concurrency",
+      "name": "Concurrency Control",
+      "parentId": "data",
+      "summary": "Optimistic and pessimistic locking, MVCC, two-phase locking, and distributed transactions (2PC, Saga) for coordinating concurrent writes.",
+      "order": 6
+    },
+    {
+      "id": "queues",
+      "name": "Message Queues",
+      "parentId": "async",
+      "summary": "Point-to-point and pub/sub messaging with RabbitMQ, SQS, and Kafka; dead-letter queues, acknowledgement semantics, and at-least-once delivery guarantees.",
+      "order": 1
+    },
+    {
+      "id": "stream-processing",
+      "name": "Stream Processing",
+      "parentId": "async",
+      "summary": "Real-time event processing with Kafka Streams, Flink, and Spark Streaming; windowing, watermarking, and exactly-once semantics.",
+      "order": 2
+    },
+    {
+      "id": "reliability",
+      "name": "Reliability Engineering",
+      "parentId": "async",
+      "summary": "Retry policies, circuit breakers, timeouts, bulkheads, and chaos engineering practices that make services recover gracefully from failures.",
+      "order": 3
+    },
+    {
+      "id": "observability",
+      "name": "Observability",
+      "parentId": "async",
+      "summary": "The three pillars—metrics, logs, and distributed traces—and the tooling (Prometheus, Grafana, OpenTelemetry, Jaeger) used to understand system behaviour.",
+      "order": 4
+    },
+    {
+      "id": "embeddings-vector-search",
+      "name": "Embeddings & Vector Search",
+      "parentId": "ai-systems",
+      "summary": "Dense vector representations of text, images, and code; ANN indexing (HNSW, IVF); and hybrid BM25 + dense retrieval with reciprocal rank fusion.",
+      "order": 1
+    },
+    {
+      "id": "rag",
+      "name": "Retrieval-Augmented Generation",
+      "parentId": "ai-systems",
+      "summary": "Architecture patterns for grounding LLM responses in retrieved documents: chunking, indexing, re-ranking, query rewriting, and quality evaluation.",
+      "order": 2
+    },
+    {
+      "id": "llm-inference",
+      "name": "LLM Inference",
+      "parentId": "ai-systems",
+      "summary": "Serving large language models efficiently: continuous batching, KV-cache management, quantisation, speculative decoding, and disaggregated prefill/decode.",
+      "order": 3
+    },
+    {
+      "id": "agents",
+      "name": "Agentic Systems",
+      "parentId": "ai-systems",
+      "summary": "LLM-powered agents with tools, memory, and planning; multi-agent orchestration; loop prevention; and evaluation frameworks for long-horizon tasks.",
+      "order": 4
+    },
+    {
+      "id": "fine-tuning",
+      "name": "Fine-tuning",
+      "parentId": "ai-systems",
+      "summary": "Parameter-efficient fine-tuning (LoRA, QLoRA), full fine-tuning, dataset curation, catastrophic forgetting mitigation, and trade-offs with in-context learning.",
+      "order": 5
+    },
+    {
+      "id": "evaluation",
+      "name": "Evaluation",
+      "parentId": "ai-systems",
+      "summary": "Benchmark design, LLM-as-judge, RAGAS, human evaluation, A/B testing, and the metrics used to compare model and system quality objectively.",
+      "order": 6
+    },
+    {
+      "id": "multimodal",
+      "name": "Multimodal Systems",
+      "parentId": "ai-systems",
+      "summary": "Unified and late-fusion architectures for text, image, audio, and video; ColPali document retrieval; VLMs for generation; and multimodal evaluation.",
+      "order": 7
+    }
+  ]
+}

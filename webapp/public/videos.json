@@ -1,0 +1,365 @@
+{
+  "videos": [
+    {
+      "id": "gs-system-primer",
+      "youtubeId": "SqcXvc3ZmRU",
+      "title": "System Design Primer ⭐️: How to start with distributed systems?",
+      "channel": "Gaurav Sen",
+      "level": "beginner",
+      "concepts": [
+        "scalability",
+        "latency-metrics"
+      ],
+      "summary": "Gaurav Sen lays out a roadmap for learning distributed systems, explaining what scalability means and why you must reason about it before designing anything."
+    },
+    {
+      "id": "gs-horiz-vert-scaling",
+      "youtubeId": "xpDnVSmNFX0",
+      "title": "System Design BASICS: Horizontal vs. Vertical Scaling",
+      "channel": "Gaurav Sen",
+      "level": "beginner",
+      "concepts": [
+        "scalability"
+      ],
+      "summary": "Clear comparison of adding more CPUs/RAM to one machine (vertical) versus adding more machines (horizontal), with trade-offs for each approach."
+    },
+    {
+      "id": "gs-load-balancing",
+      "youtubeId": "K0Ta65OqQkY",
+      "title": "What is LOAD BALANCING? ⚖️",
+      "channel": "Gaurav Sen",
+      "level": "beginner",
+      "concepts": [
+        "load-balancing"
+      ],
+      "summary": "Introduces load balancers, explains round-robin and least-connections strategies, and walks through why they are critical for availability."
+    },
+    {
+      "id": "gs-consistent-hashing",
+      "youtubeId": "zaRkONvyGr8",
+      "title": "What is CONSISTENT HASHING and Where is it used?",
+      "channel": "Gaurav Sen",
+      "level": "beginner",
+      "concepts": [
+        "load-balancing",
+        "sharding"
+      ],
+      "summary": "Explains the problem with naive modulo hashing when nodes change, then introduces the ring-based consistent hashing solution with virtual nodes."
+    },
+    {
+      "id": "bbg-algorithms-sd",
+      "youtubeId": "xbgzl2maQUU",
+      "title": "Algorithms You Should Know Before System Design Interviews",
+      "channel": "ByteByteGo",
+      "level": "beginner",
+      "concepts": [
+        "scalability",
+        "caching",
+        "sharding"
+      ],
+      "summary": "ByteByteGo surveys the key algorithms behind system design—consistent hashing, bloom filters, Merkle trees, and more—with animated diagrams."
+    },
+    {
+      "id": "hn-btree-database",
+      "youtubeId": "UzHl2VzyZS4",
+      "title": "B-tree vs B+ tree in Database Systems",
+      "channel": "Hussein Nasser",
+      "level": "beginner",
+      "concepts": [
+        "databases"
+      ],
+      "summary": "Hussein Nasser compares B-tree and B+ tree structures, explaining how they differ in storage of data pointers and why B+ trees dominate relational database indexes."
+    },
+    {
+      "id": "hn-kafka-intro",
+      "youtubeId": "LN_HcJVbySw",
+      "title": "What is Kafka and How does it work?",
+      "channel": "Hussein Nasser",
+      "level": "beginner",
+      "concepts": [
+        "queues",
+        "stream-processing"
+      ],
+      "summary": "A beginner-friendly breakdown of Apache Kafka covering topics, partitions, producers, consumers, and consumer groups with real examples."
+    },
+    {
+      "id": "hn-nginx-crash",
+      "youtubeId": "hcw-NjOh8r0",
+      "title": "NginX Crash Course",
+      "channel": "Hussein Nasser",
+      "level": "beginner",
+      "concepts": [
+        "load-balancing",
+        "cdn"
+      ],
+      "summary": "Covers how NGINX works as both a web server and reverse proxy, including configuration for load balancing, TLS termination, and caching static assets."
+    },
+    {
+      "id": "jhnl-db-indexes",
+      "youtubeId": "LzNdvuj3a5M",
+      "title": "Database Indexes: What do they do? | Systems Design Interview: 0 to 1 with Google Software Engineer",
+      "channel": "Jordan has no life",
+      "level": "beginner",
+      "concepts": [
+        "databases"
+      ],
+      "summary": "Walks through what a database index is, how B-tree and hash indexes work, and the trade-offs between read performance and write overhead."
+    },
+    {
+      "id": "assemblyai-vector-dbs",
+      "youtubeId": "dN0lsF2cvm4",
+      "title": "Vector Databases simply explained! (Embeddings & Indexes)",
+      "channel": "AssemblyAI",
+      "level": "beginner",
+      "concepts": [
+        "embeddings-vector-search"
+      ],
+      "summary": "Explains vector embeddings and how vector databases store and search high-dimensional data using ANN indexes such as HNSW."
+    },
+    {
+      "id": "hi-rate-limiter",
+      "youtubeId": "MIJFyUPG4Z4",
+      "title": "Design a Distributed Rate Limiter w/ a Ex-Meta Staff Engineer: System Design Breakdown",
+      "channel": "Hello Interview",
+      "level": "beginner",
+      "concepts": [
+        "rate-limiting"
+      ],
+      "summary": "A Meta staff engineer walks through designing a distributed rate limiter, covering token bucket, sliding window log, Redis-based counters, and multi-region concerns."
+    },
+    {
+      "id": "hi-message-queues",
+      "youtubeId": "1ISRd0bS714",
+      "title": "Message Queues in System Design Interviews w/ Meta Staff Engineer",
+      "channel": "Hello Interview",
+      "level": "beginner",
+      "concepts": [
+        "queues"
+      ],
+      "summary": "Explains when and how to introduce a message queue in a system design interview, including fan-out patterns, backpressure, and durability guarantees."
+    },
+    {
+      "id": "bbg-consistent-hashing",
+      "youtubeId": "UF9Iqmg94tk",
+      "title": "Consistent Hashing | Algorithms You Should Know #1",
+      "channel": "ByteByteGo",
+      "level": "intermediate",
+      "concepts": [
+        "sharding",
+        "load-balancing"
+      ],
+      "summary": "ByteByteGo visualizes consistent hashing with virtual nodes, showing exactly how requests are routed and how node additions or removals minimize key remapping."
+    },
+    {
+      "id": "bbg-kafka-fast",
+      "youtubeId": "UNUz1-msbOM",
+      "title": "System Design: Why is Kafka fast?",
+      "channel": "ByteByteGo",
+      "level": "intermediate",
+      "concepts": [
+        "stream-processing",
+        "queues"
+      ],
+      "summary": "Dives into the design choices that make Kafka extremely fast: sequential disk I/O, zero-copy data transfer, and batched compression of messages."
+    },
+    {
+      "id": "bbg-kafka-3min",
+      "youtubeId": "HZklgPkboro",
+      "title": "System Design: Apache Kafka In 3 Minutes",
+      "channel": "ByteByteGo",
+      "level": "intermediate",
+      "concepts": [
+        "queues",
+        "stream-processing"
+      ],
+      "summary": "A rapid animated overview of Kafka architecture—brokers, topics, partitions, replication, and consumer groups—ideal for a quick refresher before an interview."
+    },
+    {
+      "id": "hn-db-replication",
+      "youtubeId": "aE2UPg3Ckck",
+      "title": "All Types of Database Replication Discussed",
+      "channel": "Hussein Nasser",
+      "level": "intermediate",
+      "concepts": [
+        "replication",
+        "consistency"
+      ],
+      "summary": "Hussein Nasser surveys synchronous, asynchronous, logical, and streaming replication, explaining the consistency vs. performance trade-offs for each mode."
+    },
+    {
+      "id": "hn-acid",
+      "youtubeId": "QCKZ3VZ87Qo",
+      "title": "Database ACID - Live Stream (by Hussein Nasser)",
+      "channel": "Hussein Nasser",
+      "level": "intermediate",
+      "concepts": [
+        "durability",
+        "consistency",
+        "databases"
+      ],
+      "summary": "A deep-dive into ACID properties—atomicity, consistency, isolation, and durability—showing how relational databases implement each guarantee with real SQL examples."
+    },
+    {
+      "id": "sdfc-youtube-sd",
+      "youtubeId": "ghYbFgeqXa0",
+      "title": "System Design: YouTube (with FAANG Senior Engineer)",
+      "channel": "System Design Fight Club",
+      "level": "intermediate",
+      "concepts": [
+        "cdn",
+        "caching",
+        "scalability"
+      ],
+      "summary": "A FAANG senior engineer designs a YouTube-like video platform, covering upload pipelines, transcoding, CDN edge caching, and recommendation feed scaling."
+    },
+    {
+      "id": "sdfc-rate-limiter",
+      "youtubeId": "NvQXO7tleDI",
+      "title": "Atlassian Interview Question | System Design: Rate Limiter (5+ Approaches)",
+      "channel": "System Design Fight Club",
+      "level": "intermediate",
+      "concepts": [
+        "rate-limiting",
+        "consistency"
+      ],
+      "summary": "Explores five distinct rate-limiter designs—in-process, Redis-based, sliding window, token bucket, and distributed—weighing each for a real Atlassian interview scenario."
+    },
+    {
+      "id": "jhnl-dropbox-sd",
+      "youtubeId": "4wIU4rTV-JU",
+      "title": "3: Dropbox + Google Drive | Systems Design Interview Questions With Ex-Google SWE",
+      "channel": "Jordan has no life",
+      "level": "intermediate",
+      "concepts": [
+        "databases",
+        "sharding",
+        "cdn"
+      ],
+      "summary": "Designs a cloud storage service from scratch, addressing block-level deduplication, metadata storage sharding, sync conflict resolution, and CDN-based delivery."
+    },
+    {
+      "id": "hi-design-leetcode",
+      "youtubeId": "1xHADtekTNg",
+      "title": "System Design Interview: Design LeetCode (Online Judge) w/ a Ex-Meta Staff Engineer",
+      "channel": "Hello Interview",
+      "level": "intermediate",
+      "concepts": [
+        "databases",
+        "caching",
+        "api-design"
+      ],
+      "summary": "Step-by-step design of an online judge system, covering problem and submission storage, distributed code execution sandboxes, and result caching."
+    },
+    {
+      "id": "anyscale-rag-scale",
+      "youtubeId": "uTz7Jyunb98",
+      "title": "Why RAG Breaks at Scale | Anyscale Webinar",
+      "channel": "Anyscale",
+      "level": "intermediate",
+      "concepts": [
+        "rag",
+        "embeddings-vector-search"
+      ],
+      "summary": "Anyscale engineers diagnose where RAG pipelines fail under production scale, covering chunking strategies, embedding drift, retrieval precision, and async data pipelines."
+    },
+    {
+      "id": "pragmatic-vector-arch",
+      "youtubeId": "3y_7fE5Ftaw",
+      "title": "Vector Database Architecture Explained",
+      "channel": "Pragmatic AI Labs",
+      "level": "intermediate",
+      "concepts": [
+        "embeddings-vector-search"
+      ],
+      "summary": "A thorough walkthrough of vector database internals—HNSW graphs, IVF indexes, quantization, and the trade-offs between recall, latency, and storage."
+    },
+    {
+      "id": "sdfc-fb-messenger",
+      "youtubeId": "Pq5Iy0FGYMM",
+      "title": "System Design: Facebook Messenger (5+ approaches)",
+      "channel": "System Design Fight Club",
+      "level": "intermediate",
+      "concepts": [
+        "queues",
+        "sharding",
+        "consistency"
+      ],
+      "summary": "A FAANG senior engineer presents five different chat backend architectures, from simple pub-sub to fan-out-on-read vs. write, with explicit trade-off analysis."
+    },
+    {
+      "id": "hi-design-tinder",
+      "youtubeId": "18Fg5Akhkqw",
+      "title": "System Design Interview: Design Tinder w/ a Ex-Meta Staff Engineer",
+      "channel": "Hello Interview",
+      "level": "advanced",
+      "concepts": [
+        "sharding",
+        "databases",
+        "caching",
+        "scalability"
+      ],
+      "summary": "Deep-dive into a geo-distributed matching service, covering profile storage sharding, geohash-based proximity search, recommendation ranking, and swipe-storm traffic shaping."
+    },
+    {
+      "id": "jhnl-netflix-youtube",
+      "youtubeId": "43bB7oSn190",
+      "title": "5: Netflix + YouTube | Systems Design Interview Questions With Ex-Google SWE",
+      "channel": "Jordan has no life",
+      "level": "advanced",
+      "concepts": [
+        "cdn",
+        "replication",
+        "stream-processing"
+      ],
+      "summary": "Designs a large-scale video streaming service covering adaptive bitrate streaming, CDN placement strategy, view-count aggregation pipelines, and multi-region replication."
+    },
+    {
+      "id": "anyscale-vllm-rise",
+      "youtubeId": "WLl8D1nyaW8",
+      "title": "The Rise of vLLM: Building an Open Source LLM Inference Engine",
+      "channel": "Anyscale",
+      "level": "advanced",
+      "concepts": [
+        "llm-inference"
+      ],
+      "summary": "The vLLM team traces the design of PagedAttention and continuous batching that made vLLM the dominant open-source LLM serving engine, with throughput benchmarks."
+    },
+    {
+      "id": "anyscale-model-serving",
+      "youtubeId": "LKUBwGTUDZE",
+      "title": "Faster Model Serving with Ray and Anyscale | Ray Summit 2024",
+      "channel": "Anyscale",
+      "level": "advanced",
+      "concepts": [
+        "llm-inference",
+        "scalability"
+      ],
+      "summary": "Covers Ray Serve’s autoscaling, request batching, and multi-GPU deployment patterns for production LLM inference, with cost and latency benchmarks."
+    },
+    {
+      "id": "anyscale-llm-platform",
+      "youtubeId": "ciJY7JAWzi8",
+      "title": "Anyscale’s Unified Platform for LLM Development and Deployment | Ray Summit 2024",
+      "channel": "Anyscale",
+      "level": "advanced",
+      "concepts": [
+        "llm-inference",
+        "agents",
+        "rag"
+      ],
+      "summary": "Presents Anyscale’s end-to-end platform for LLM workflows—training, fine-tuning, RAG pipelines, agentic orchestration, and production serving—on Ray."
+    },
+    {
+      "id": "anyscale-ray-serve",
+      "youtubeId": "TJ5K1CO9Wbs",
+      "title": "Enabling Cost-Efficient LLM Serving with Ray Serve",
+      "channel": "Anyscale",
+      "level": "advanced",
+      "concepts": [
+        "llm-inference",
+        "scalability"
+      ],
+      "summary": "Shows how Ray Serve’s fractional GPU sharing, replica autoscaling, and request routing reduce LLM serving cost significantly versus naive single-model deployments."
+    }
+  ]
+}
