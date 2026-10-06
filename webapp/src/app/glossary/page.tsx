@@ -6,6 +6,7 @@ import { useGlossary, useChapters } from '@/lib/data'
 import { PageHeader, SearchInput, SegmentedFilter, SectionHeading, EmptyState } from '@/components/ui'
 import AZBar from '@/components/glossary/AZBar'
 import TermCard from '@/components/glossary/TermCard'
+import TermDetailDialog from '@/components/glossary/TermDetailDialog'
 import { flashAndScroll } from '@/components/glossary/glossaryUtils'
 import type { GlossaryTerm } from '@/types'
 
@@ -21,6 +22,7 @@ export default function GlossaryPage() {
     typeof window !== 'undefined' ? window.location.hash.slice(1) || null : null,
   )
   const didHash = useRef(false)
+  const [openId, setOpenId] = useState<string | null>(null)
 
   const categories = useMemo(() => glossary?.categories ?? [], [glossary])
   const allTerms = useMemo(() => glossary?.terms ?? [], [glossary])
@@ -189,6 +191,7 @@ export default function GlossaryPage() {
                         termById={termById}
                         highlighted={highlightId === t.id}
                         onRelatedClick={handleRelatedClick}
+                        onOpen={setOpenId}
                         chaptersIndex={chaptersIndex}
                       />
                     </div>
@@ -201,13 +204,20 @@ export default function GlossaryPage() {
                     <div
                       key={t.id}
                       id={t.id}
-                      className={`p-3.5 flex flex-col md:flex-row md:items-start justify-between gap-3 transition-colors ${
+                      className={`relative p-3.5 flex flex-col md:flex-row md:items-start justify-between gap-3 transition-colors ${
                         highlightId === t.id ? 'bg-accent-subtle' : 'hover:bg-bg-raised'
                       }`}
                     >
                       {/* Term name & aliases */}
                       <div className="md:w-64 shrink-0">
-                        <div className="text-sm font-semibold text-text-primary">{t.term}</div>
+                        <button
+                          type="button"
+                          onClick={() => setOpenId(t.id)}
+                          aria-haspopup="dialog"
+                          className="text-left text-sm font-semibold text-text-primary cursor-pointer outline-none after:absolute after:inset-0 after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-accent"
+                        >
+                          {t.term}
+                        </button>
                         {t.aliases && t.aliases.length > 0 && (
                           <div className="text-xs text-text-secondary italic mt-0.5">
                             {t.aliases.join(' · ')}
@@ -238,7 +248,7 @@ export default function GlossaryPage() {
                       </div>
 
                       {/* Chapters & Related */}
-                      <div className="md:w-56 shrink-0 flex flex-col items-end gap-1.5 text-xs font-mono">
+                      <div className="relative z-10 md:w-56 shrink-0 flex flex-col items-end gap-1.5 text-xs font-mono">
                         {t.chapters && t.chapters.length > 0 && (
                           <div className="flex flex-wrap justify-end gap-1">
                             {t.chapters.map((slug) => (
@@ -287,6 +297,14 @@ export default function GlossaryPage() {
           />
         )}
       </div>
+      <TermDetailDialog
+        term={openId ? (allTerms.find((t) => t.id === openId) ?? null) : null}
+        termById={termById}
+        categoryName={categories.find((c) => c.id === allTerms.find((t) => t.id === openId)?.category)?.name}
+        chaptersIndex={chaptersIndex}
+        onClose={() => setOpenId(null)}
+        onNavigate={setOpenId}
+      />
     </div>
   )
 }

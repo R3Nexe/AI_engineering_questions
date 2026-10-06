@@ -40,7 +40,7 @@ Dependencies:
 
 Entry: `src/app/concepts/page.tsx` (268)
 Dependencies:
-- `src/lib/data.ts` (60) [useConcepts, useVideos hooks — fetch /concepts.json, /videos.json]
+- `src/lib/data.ts` (60) [useConcepts, useVideos hooks, backed by the Supabase cache in src/lib/cache.ts]
 - `src/store.ts` (106) [useStore — pack, attempts, videoProgress]
 - `src/lib/progress.ts` (175) [conceptStats utility]
 - `src/components/concepts/MasteryBar.tsx` (26)
@@ -123,7 +123,7 @@ Dependencies:
 
 Entry: `src/app/glossary/page.tsx` (149)
 Dependencies:
-- `src/lib/data.ts` (60) [useGlossary — fetches /glossary.json]
+- `src/lib/data.ts` (60) [useGlossary, backed by the Supabase cache in src/lib/cache.ts]
 - `src/components/glossary/SearchBox.tsx` (34)
 - `src/components/glossary/CategoryChips.tsx` (43)
   - `src/types.ts` (108) [GlossaryCategory, GlossaryTerm]

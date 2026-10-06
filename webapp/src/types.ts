@@ -26,8 +26,6 @@ export interface Question {
 }
 
 export interface QuestionPack {
-  version: number
-  updated: string
   categories: QuestionCategory[]
   questions: Question[]
 }
@@ -74,8 +72,16 @@ export interface GlossaryTerm {
   example: string
   related: string[]
   concepts: string[]
-  /** Chapter slugs (public/chapters/index.json) where this term is explained. */
+  /** Chapter slugs (chapters.slug) where this term is explained. */
   chapters?: string[]
+  /** Detailed technical mechanics explaining how the concept operates under the hood. */
+  howItWorks?: string
+  /** Engineering trade-offs, advantages, and disadvantages. */
+  tradeoffs?: string
+  /** Real-world production failure modes and pitfalls. */
+  failureModes?: string
+  /** Practical code, configuration, or CLI example. */
+  codeSnippet?: string
 }
 
 export interface Video {
@@ -116,7 +122,6 @@ export interface Chapter {
 }
 
 export interface ChapterIndex {
-  source: { repo: string; book: string; importedAt: string }
   chapters: Chapter[]
 }
 

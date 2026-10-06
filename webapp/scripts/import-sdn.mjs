@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// import-sdn.mjs — import liquidslr/system-design-notes into webapp/public/chapters/
+// import-sdn.mjs — import liquidslr/system-design-notes into webapp/content/chapters/
 // Usage (from webapp/): node scripts/import-sdn.mjs /tmp/sdn/liquidslr-system-design-notes-9d83887
 
 import {
@@ -12,8 +12,8 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const WEBAPP_DIR = resolve(__dirname, '..');
-const PUBLIC_CHAPTERS = join(WEBAPP_DIR, 'public', 'chapters');
-const EXISTING_INDEX = join(PUBLIC_CHAPTERS, 'index.json');
+const CHAPTERS_DIR = join(WEBAPP_DIR, 'content', 'chapters');
+const EXISTING_INDEX = join(CHAPTERS_DIR, 'index.json');
 
 // ─── CLI ─────────────────────────────────────────────────────────────────────
 
@@ -348,7 +348,7 @@ function processMarkdown(content, slug, numToSlug) {
 // ─── MAIN ────────────────────────────────────────────────────────────────────
 
 console.log(`\nImporting from: ${SOURCE_DIR}`);
-console.log(`Output to:      ${PUBLIC_CHAPTERS}\n`);
+console.log(`Output to:      ${CHAPTERS_DIR}\n`);
 
 // Load root Readme for title fallback
 const rootReadme = readFileSync(join(SOURCE_DIR, 'Readme.md'), 'utf8');
@@ -370,15 +370,15 @@ if (existsSync(EXISTING_INDEX)) {
 }
 
 // Clear output directory (preserve root index.json if it exists, we'll overwrite it)
-if (existsSync(PUBLIC_CHAPTERS)) {
+if (existsSync(CHAPTERS_DIR)) {
   // Only delete chapter subdirs, not the root index.json itself
-  for (const entry of readdirSync(PUBLIC_CHAPTERS, { withFileTypes: true })) {
+  for (const entry of readdirSync(CHAPTERS_DIR, { withFileTypes: true })) {
     if (entry.isDirectory()) {
-      rmSync(join(PUBLIC_CHAPTERS, entry.name), { recursive: true, force: true });
+      rmSync(join(CHAPTERS_DIR, entry.name), { recursive: true, force: true });
     }
   }
 }
-mkdirSync(PUBLIC_CHAPTERS, { recursive: true });
+mkdirSync(CHAPTERS_DIR, { recursive: true });
 
 // Enumerate chapter directories
 const chapterDirs = readdirSync(SOURCE_DIR, { withFileTypes: true })
@@ -443,7 +443,7 @@ for (const dirEntry of chapterDirs) {
 
   // Copy images
   const srcImagesDir = join(chSrcDir, 'images');
-  const destImagesDir = join(PUBLIC_CHAPTERS, slug, 'images');
+  const destImagesDir = join(CHAPTERS_DIR, slug, 'images');
   const imagesOnDisk = new Set();
   const copiedFiles = [];
 
@@ -461,7 +461,7 @@ for (const dirEntry of chapterDirs) {
     }
   } else {
     // Ensure chapter dir exists even without images
-    mkdirSync(join(PUBLIC_CHAPTERS, slug), { recursive: true });
+    mkdirSync(join(CHAPTERS_DIR, slug), { recursive: true });
   }
 
   // Process markdown
@@ -485,8 +485,8 @@ for (const dirEntry of chapterDirs) {
   }
 
   // Write cleaned markdown
-  mkdirSync(join(PUBLIC_CHAPTERS, slug), { recursive: true });
-  writeFileSync(join(PUBLIC_CHAPTERS, slug, 'index.md'), cleaned, 'utf8');
+  mkdirSync(join(CHAPTERS_DIR, slug), { recursive: true });
+  writeFileSync(join(CHAPTERS_DIR, slug, 'index.md'), cleaned, 'utf8');
 
   const concepts = existingConcepts[slug] ?? [];
   const readingMinutes = Math.ceil(wc / 220);

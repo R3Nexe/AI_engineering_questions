@@ -1,6 +1,10 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { QuestionPack, Draft, AttemptRecord, SidebarItem, VideoStatus } from '@/types'
+import { loadResource, subscribeResource } from '@/lib/cache'
+import { questionPackResource } from '@/lib/content'
+import type { Draft, AttemptRecord, QuestionPack, SidebarItem, VideoStatus } from '@/types'
+
+let packSubscribed = false
 
 interface StoreState {
   // Data
@@ -48,9 +52,13 @@ export const useStore = create<StoreState>()(
 
       loadPack: async () => {
         if (get().pack) return
-        const res = await fetch('/questions.json')
-        const pack: QuestionPack = await res.json()
+        const pack = await loadResource(questionPackResource)
         set({ pack })
+        // Pick up the background refresh when the cached pack was stale.
+        if (!packSubscribed) {
+          packSubscribed = true
+          subscribeResource(questionPackResource, (fresh) => set({ pack: fresh }))
+        }
       },
 
       // ── Navigation ────────────────────────────────────────────────

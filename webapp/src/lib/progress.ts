@@ -31,8 +31,15 @@ function subtreeIds(conceptId: string, concepts: ConceptNode[]): Set<string> {
   return result
 }
 
+// Callers such as the concepts page ask for stats once per concept. The store replaces
+// the attempts array on every change, so keying on its identity is safe and avoids
+// rebuilding this map once per concept.
+const latestMapCache = new WeakMap<AttemptRecord[], Map<string, AttemptRecord>>()
+
 /** Returns a map of questionId → most recent AttemptRecord. */
 function buildLatestMap(attempts: AttemptRecord[]): Map<string, AttemptRecord> {
+  const cached = latestMapCache.get(attempts)
+  if (cached) return cached
   const map = new Map<string, AttemptRecord>()
   // store prepends newest, so first occurrence = latest
   for (const a of attempts) {
@@ -40,6 +47,7 @@ function buildLatestMap(attempts: AttemptRecord[]): Map<string, AttemptRecord> {
       map.set(a.questionId, a)
     }
   }
+  latestMapCache.set(attempts, map)
   return map
 }
 
